@@ -1,13 +1,21 @@
 package bookRecordJFrame;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,99 +29,198 @@ import javax.swing.UnsupportedLookAndFeelException;
 import com.formdev.flatlaf.FlatLightLaf;
 
 public class ShowBookRecord extends JFrame {
-
     private static final long serialVersionUID = 1L;
+    private Color buttonColor = new Color(70, 130, 180); // BookRecords と同じボタン色
 
     public ShowBookRecord(String bookId) {
         setTitle("Book Details");
-        setBounds(100, 100, 900, 600);
+        setBounds(100, 100, 900, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         try {
-            UIManager.setLookAndFeel(new FlatLightLaf());  // 明るいテーマ（FlatLightLaf）
+            UIManager.setLookAndFeel(new FlatLightLaf());
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
 
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
-        panel.setBackground(new Color(245, 245, 245));
-        getContentPane().add(panel);
-
+        // メインパネル - BorderLayout
+        setLayout(new BorderLayout());
+        
         // 本のデータをCSVから読み込む
         String[] bookData = loadBookDataById(bookId);
         if (bookData == null) {
-            JLabel errorLabel = new JLabel("Error: Book not found.");
-            errorLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
-            errorLabel.setBounds(20, 20, 550, 30);
-            panel.add(errorLabel);
+            JPanel errorPanel = createErrorPanel();
+            add(errorPanel, BorderLayout.CENTER);
             return;
         }
 
-        // データをラベルとして表示
-        JLabel idLabel = new JLabel("ID: " + bookData[0]);
-        idLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
-        idLabel.setBounds(20, 20, 550, 30);
-        panel.add(idLabel);
-
-        JLabel titleLabel = new JLabel("Title: " + bookData[1]);
-        titleLabel.setFont(new Font("メイリオ", Font.BOLD, 20));
-        titleLabel.setBounds(20, 70, 550, 30);
-        panel.add(titleLabel);
-
-        JLabel authorLabel = new JLabel("Author: " + bookData[2]);
-        authorLabel.setFont(new Font("メイリオ", Font.PLAIN, 16));
-        authorLabel.setBounds(20, 110, 550, 25);
-        panel.add(authorLabel);
-
-        JLabel reviewLabel = new JLabel("Review: " + bookData[3] + "/5");
-        reviewLabel.setFont(new Font("メイリオ", Font.PLAIN, 16));
-        reviewLabel.setBounds(20, 150, 550, 25);
-        panel.add(reviewLabel);
-
-        JLabel thoughtsLabel = new JLabel("Thoughts:");
+        // コンテンツパネル（中央に配置）
+        JPanel contentPanel = createContentPanel(bookData);
+        add(contentPanel, BorderLayout.CENTER);
+        
+        // ボタンパネル（下部に配置）
+        JPanel buttonPanel = createButtonPanel(bookData);
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
+    
+    private JPanel createErrorPanel() {
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        JLabel errorLabel = new JLabel("Error: Book not found.");
+        errorLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
+        errorLabel.setForeground(Color.RED);
+        panel.add(errorLabel);
+        
+        return panel;
+    }
+    
+    private JPanel createContentPanel(String[] bookData) {
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setLayout(new GridBagLayout());
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        
+        // 日付を BookRecords と同じフォーマットに変換
+        String formattedDate = formatDate(bookData[1]);
+        
+        // 日付ラベル
+        JLabel dateLabel = new JLabel("Registration Date: " + formattedDate);
+        dateLabel.setFont(new Font("メイリオ", Font.PLAIN, 14));
+        gbc.insets = new Insets(5, 0, 15, 0);
+        panel.add(dateLabel, gbc);
+        
+        // タイトルラベル
+        JLabel titleLabel = new JLabel(bookData[2]);
+        titleLabel.setFont(new Font("メイリオ", Font.BOLD, 24));
+        gbc.insets = new Insets(0, 0, 5, 0);
+        panel.add(titleLabel, gbc);
+        
+        // 著者ラベル - "by" を削除
+        JLabel authorLabel = new JLabel(bookData[3]);
+        authorLabel.setFont(new Font("メイリオ", Font.ITALIC, 16));
+        gbc.insets = new Insets(0, 0, 15, 0);
+        panel.add(authorLabel, gbc);
+        
+        // 評価ラベル - 星表示の修正（JLabelではなくJPanelを使用）
+        JPanel ratingPanel = createRatingPanel(bookData[4]);
+        gbc.insets = new Insets(0, 0, 20, 0);
+        panel.add(ratingPanel, gbc);
+        
+        // 思考セクションラベル - "Reader's Notes"を"感想"に変更
+        JLabel thoughtsLabel = new JLabel("感想");
         thoughtsLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
-        thoughtsLabel.setBounds(20, 190, 550, 25);
-        panel.add(thoughtsLabel);
-
-        JTextArea thoughtsArea = new JTextArea();
-        thoughtsArea.setText(bookData[4]);
+        gbc.insets = new Insets(0, 0, 10, 0);
+        panel.add(thoughtsLabel, gbc);
+        
+        // 思考テキストエリア
+        JTextArea thoughtsArea = new JTextArea(bookData[5]);
         thoughtsArea.setWrapStyleWord(true);
         thoughtsArea.setLineWrap(true);
         thoughtsArea.setCaretPosition(0);
         thoughtsArea.setEditable(false);
         thoughtsArea.setFont(new Font("メイリオ", Font.PLAIN, 14));
-
+        thoughtsArea.setBackground(new Color(245, 245, 250));
+        thoughtsArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
         JScrollPane scrollPane = new JScrollPane(thoughtsArea);
-        scrollPane.setBounds(20, 220, 550, 150);
-        panel.add(scrollPane);
-
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 220)));
+        scrollPane.setPreferredSize(new Dimension(600, 200));
+        
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        panel.add(scrollPane, gbc);
+        
+        return panel;
+    }
+    
+    // 星評価用のパネルを作成するメソッド
+    private JPanel createRatingPanel(String rating) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        panel.setBackground(Color.WHITE);
+        
+        try {
+            int reviewCount = Integer.parseInt(rating);
+            
+            // 星のラベルを作成
+            for (int i = 0; i < 5; i++) {
+                JLabel starLabel = new JLabel();
+                if (i < reviewCount) {
+                    // 評価分は黄色の星
+                    starLabel.setText("★");
+                    starLabel.setForeground(Color.YELLOW);
+                } else {
+                    // 残りは灰色の星
+                    starLabel.setText("★");
+                    starLabel.setForeground(Color.GRAY);
+                }
+                starLabel.setFont(new Font("Dialog", Font.PLAIN, 18));
+                panel.add(starLabel);
+            }
+        } catch (NumberFormatException e) {
+            JLabel ratingLabel = new JLabel(rating + "/5");
+            ratingLabel.setFont(new Font("メイリオ", Font.PLAIN, 16));
+            panel.add(ratingLabel);
+        }
+        
+        return panel;
+    }
+    
+    private JPanel createButtonPanel(String[] bookData) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(220, 220, 220)),
+            BorderFactory.createEmptyBorder(10, 0, 10, 0)
+        ));
+        
         // 編集ボタン
         JButton editButton = new JButton("Edit Book Record");
         editButton.setFont(new Font("メイリオ", Font.BOLD, 14));
-        editButton.setBackground(new Color(70, 130, 180));
+        editButton.setBackground(buttonColor);
         editButton.setForeground(Color.WHITE);
-        editButton.setBounds(20, 380, 200, 40);
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose();  // 現在の画面を閉じる
-                new EditBookRecord(bookData).setVisible(true);  // EditBookRecord画面を開く
-            }
+        editButton.setFocusPainted(false);
+        editButton.addActionListener((ActionEvent e) -> {
+            dispose();
+            new EditBookRecord(bookData).setVisible(true);
         });
-        panel.add(editButton);
-
+        
+        // 戻るボタン
         JButton backButton = new JButton("Back to List");
         backButton.setFont(new Font("メイリオ", Font.BOLD, 14));
-        backButton.setBackground(new Color(70, 130, 180));
+        backButton.setBackground(buttonColor);
         backButton.setForeground(Color.WHITE);
-        backButton.setBounds(240, 380, 150, 40);
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose();  // 現在のウィンドウを閉じる
-                new BookRecords().setVisible(true);  // BookRecords画面に戻る
-            }
+        backButton.setFocusPainted(false);
+        backButton.addActionListener((ActionEvent e) -> {
+            dispose();
+            new BookRecords().setVisible(true);
         });
+        
+        panel.add(editButton);
         panel.add(backButton);
+        
+        return panel;
+    }
+
+    private String formatDate(String dateStr) {
+        try {
+            // "yyyy-MM-dd HH:mm:ss" 形式を解析
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = inputFormat.parse(dateStr);
+
+            // "yyyy年M月d日" 形式にフォーマット (BookRecords と同じ)
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy年M月d日");
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            return dateStr; // 変換エラーがあった場合、元の文字列をそのまま返す
+        }
     }
 
     private String[] loadBookDataById(String bookId) {
@@ -121,7 +228,7 @@ public class ShowBookRecord extends JFrame {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length == 5 && data[0].equals(bookId)) {
+                if (data.length == 6 && data[0].equals(bookId)) {
                     return data;
                 }
             }
@@ -132,9 +239,13 @@ public class ShowBookRecord extends JFrame {
     }
 
     public static void main(String[] args) {
-        String bookId = "1";  // ダミーID
         SwingUtilities.invokeLater(() -> {
-            ShowBookRecord frame = new ShowBookRecord(bookId);
+            try {
+                UIManager.setLookAndFeel(new FlatLightLaf());
+            } catch (UnsupportedLookAndFeelException e) {
+                e.printStackTrace();
+            }
+            ShowBookRecord frame = new ShowBookRecord("1");
             frame.setVisible(true);
         });
     }

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CSVUtility {
 
-    private static final String FILE_PATH = "book_records.csv";  // CSVファイルのパスをbook_records.csvに変更
+    private static final String FILE_PATH = "book_records.csv";  // CSVファイルのパスをbook_records.csvに設定
 
     // CSVファイルを読み込んで、書籍データをリストで返す
     public static List<String[]> readBooksFromCSV() {
@@ -54,7 +54,7 @@ public class CSVUtility {
         // 書籍データを更新
         for (int i = 0; i < books.size(); i++) {
             String[] book = books.get(i);
-            if (book[0].equals(updatedBookData[0])) {  // タイトルで一致する書籍を見つけて更新
+            if (book[0].equals(updatedBookData[0])) {  // IDで一致する書籍を見つけて更新
                 books.set(i, updatedBookData);
                 bookUpdated = true;
                 break;
@@ -64,6 +64,27 @@ public class CSVUtility {
         // 書籍データが更新された場合のみ書き込む
         if (bookUpdated) {
             writeBooksToCSV(books);  // 更新されたデータをCSVに書き込む
+        }
+    }
+
+    // 特定の書籍データを削除
+    public static void deleteBookFromCSV(String bookId) {
+        List<String[]> books = readBooksFromCSV();
+        boolean bookDeleted = false;
+
+        // 書籍データを削除
+        for (int i = 0; i < books.size(); i++) {
+            String[] book = books.get(i);
+            if (book[0].equals(bookId)) {  // IDが一致する書籍を見つけて削除
+                books.remove(i);
+                bookDeleted = true;
+                break;
+            }
+        }
+
+        // 書籍データが削除された場合のみ書き込む
+        if (bookDeleted) {
+            writeBooksToCSV(books);  // 削除後のデータをCSVに書き込む
         }
     }
 }

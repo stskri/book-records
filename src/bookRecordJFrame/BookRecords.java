@@ -1,11 +1,15 @@
 package bookRecordJFrame;
 
 import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -23,136 +28,220 @@ import javax.swing.table.DefaultTableModel;
 import com.formdev.flatlaf.FlatLightLaf;
 
 public class BookRecords extends JFrame {
-    private static final int PAGE_SIZE = 10;  // 1ページに表示するアイテム数
-    private int currentPage = 0;  // 現在のページ番号
-
-    private ArrayList<String[]> bookItems; // 本のデータリスト（String[]型に変更）
-    private DefaultTableModel tableModel;  // JTableのモデル
-    private JTable table;  // JTableをインスタンス変数として宣言
+    private static final int PAGE_SIZE = 10;
+    private int currentPage = 0;
+    private ArrayList<String[]> bookItems;
+    private ArrayList<String[]> filteredBookItems;
+    private DefaultTableModel tableModel;
+    private JTable table;
+    private JLabel totalRecordsLabel;
+    private JTextField searchField;
 
     public BookRecords() {
-        // JFrameの設定
         setTitle("Book Records");
         setBounds(100, 100, 900, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // アイテムリストを作成（CSVから読み込む）
         bookItems = new ArrayList<>();
+        filteredBookItems = new ArrayList<>();
         loadBooksFromCSV();
 
-        // IDで降順ソート（ゼロ埋めでIDをソートする）
-        bookItems.sort((book1, book2) -> {
-            String id1 = book1[0];
-            String id2 = book2[0];
-            
-            // IDが数値であることを想定してゼロ埋めを行い、6桁の数値として比較する
-            String zeroPaddedId1 = String.format("%06d", Integer.parseInt(id1));
-            String zeroPaddedId2 = String.format("%06d", Integer.parseInt(id2));
+        // 登録日時で降順ソート
+        bookItems.sort((book1, book2) -> book2[0].compareTo(book1[0]));  // idの降順
 
-            // ゼロ埋め後のIDを比較（降順）
-            return zeroPaddedId2.compareTo(zeroPaddedId1); // 降順でソート
-        });
-
-        // JTableの列名（"Date"列を削除）
-        String[] columnNames = {"ID", "Title", "Author", "Review"};
-
-        // JTableのモデルを作成
+        // JTableの列名（IDと感想を除いた4項目）
+        String[] columnNames = {"Registration Date", "Title", "Author", "Review"};
         tableModel = new DefaultTableModel(columnNames, 0);
-        table = new JTable(tableModel);  // tableをインスタンス変数として作成
+        table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // セルレンダラーを設定してレビュー数を☆で表示
+        // 日付の列を中央揃え
+        table.getColumnModel().getColumn(0).setCellRenderer(new CenteredCellRenderer());
+
+        // レビューの列を中央揃え
         table.getColumnModel().getColumn(3).setCellRenderer(new StarRatingRenderer());
 
-        // 本の選択イベントリスナーを追加
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                // 本を選択したときにShowBookRecordページに遷移
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow >= 0) {
-                    String bookId = (String) table.getValueAt(selectedRow, 0);  // ここでIDを取得
-                    openShowBookRecord(bookId);   // IDを渡して詳細ページを開く
+                    int dataIndex = selectedRow + (currentPage * PAGE_SIZE);
+                    String bookId = filteredBookItems.get(dataIndex)[0];
+                    openShowBookRecord(bookId);
                 }
             }
         });
 
-        // 「次ページ」と「前ページ」ボタンの作成
-        JButton prevButton = new JButton("Previous");
-        JButton nextButton = new JButton("Next");
+        getContentPane().setLayout(new BorderLayout());
 
-        // ボタンのアクション設定
-        prevButton.addActionListener(e -> showPage(currentPage - 1));
-        nextButton.addActionListener(e -> showPage(currentPage + 1));
+        // 上部パネルの作成 (New Book Recordボタンと総登録件数の表示)
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        // 新規登録画面への遷移ボタンの作成
+        // 検索バー
+        searchField = new JTextField(20);
+        searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                filterBooks();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                filterBooks();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                filterBooks();
+            }
+        });
+        topPanel.add(new JLabel("Search:"));
+        topPanel.add(searchField);
+
+        // 新規登録ボタン
         JButton newBookButton = new JButton("New Book Record");
         newBookButton.addActionListener(e -> openNewBookRecord());
+        topPanel.add(newBookButton);
 
-        // ボタンを配置
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(prevButton);
-        buttonPanel.add(nextButton);
-        buttonPanel.add(newBookButton);  // 新規登録ボタンを追加
+        // 総登録件数の表示
+        totalRecordsLabel = new JLabel("Total Records: " + filteredBookItems.size());
+        topPanel.add(totalRecordsLabel);
 
-        // コンテンツパネルに追加
-        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(topPanel, BorderLayout.NORTH);
         getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
-        getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+        getContentPane().add(createPaginationPanel(), BorderLayout.SOUTH);
 
-        // 初期ページを表示
         showPage(currentPage);
     }
 
-    // CSVファイルから本のデータを読み込むメソッド
+    private JPanel createPaginationPanel() {
+        JPanel paginationPanel = new JPanel();
+
+        // 1. 全ページ数を計算
+        int totalPages = (int) Math.ceil((double) filteredBookItems.size() / PAGE_SIZE);
+        if (totalPages == 0) totalPages = 1; // 本がない場合でも最低1ページ
+
+        // 2. 前ページへボタン
+        JButton prevButton = new JButton("<<");
+        prevButton.addActionListener(e -> showPage(currentPage - 1));
+        prevButton.setEnabled(currentPage > 0);
+        prevButton.setPreferredSize(new Dimension(50, 30)); // 固定サイズ設定
+        paginationPanel.add(prevButton);
+
+        // 3. ページ番号ボタンを表示（Google風に）
+        int displayPages = 7; // 9から7に減らす
+        int startPage = Math.max(0, Math.min(currentPage - displayPages / 2, totalPages - displayPages));
+        int endPage = Math.min(startPage + displayPages, totalPages);
+
+        if (endPage - startPage < displayPages && startPage > 0) {
+            startPage = Math.max(0, endPage - displayPages);
+        }
+
+        for (int i = startPage; i < endPage; i++) {
+            JButton pageButton = new JButton(String.valueOf(i + 1));
+            if (i == currentPage) {
+                pageButton.setEnabled(false);
+                pageButton.setBackground(UIManager.getColor("Button.highlight"));
+            }
+            pageButton.setPreferredSize(new Dimension(50, 30));
+            final int pageNum = i;
+            pageButton.addActionListener(e -> showPage(pageNum));
+            paginationPanel.add(pageButton);
+        }
+
+        // 4. 次ページへボタン
+        JButton nextButton = new JButton(">>");
+        nextButton.addActionListener(e -> showPage(currentPage + 1));
+        nextButton.setEnabled(currentPage < totalPages - 1);
+        nextButton.setPreferredSize(new Dimension(50, 30));
+        paginationPanel.add(nextButton);
+
+        return paginationPanel;
+    }
+
     private void loadBooksFromCSV() {
+        bookItems.clear();
         try (BufferedReader br = new BufferedReader(new FileReader("book_records.csv"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length == 5) {  // データが5つの項目を持つ場合
-                    // "Date"の項目を削除（データ配列の4番目の要素は不要）
-                    String[] filteredData = new String[4];
-                    System.arraycopy(data, 0, filteredData, 0, 4);  // 最初の4つの項目をコピー
-                    bookItems.add(filteredData);  // 新しい配列を追加
+                if (data.length == 6) {
+                    bookItems.add(data);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // idの降順でソート
+        bookItems.sort((book1, book2) -> book2[0].compareTo(book1[0]));
+
+        // フィルタリング用にfilteredBookItemsをセット
+        filteredBookItems.clear();
+        filteredBookItems.addAll(bookItems);
     }
 
     private void showPage(int page) {
-        if (page < 0 || page * PAGE_SIZE >= bookItems.size()) {
-            return;  // 無効なページ番号の場合は何もしない
-        }
+        int totalPages = (int) Math.ceil((double) filteredBookItems.size() / PAGE_SIZE);
+        if (totalPages == 0) totalPages = 1;
 
-        // 新しいページのアイテムを設定
-        tableModel.setRowCount(0);  // 既存の行を削除
+        if (page < 0 || page >= totalPages) return;
+
+        tableModel.setRowCount(0);
         int startIndex = page * PAGE_SIZE;
-        int endIndex = Math.min(startIndex + PAGE_SIZE, bookItems.size());
+        int endIndex = Math.min(startIndex + PAGE_SIZE, filteredBookItems.size());
         for (int i = startIndex; i < endIndex; i++) {
-            String[] bookData = bookItems.get(i);
-            tableModel.addRow(bookData);  // データを行として追加
+            String[] bookData = filteredBookItems.get(i);
+            String formattedDate = formatDate(bookData[1]);
+            tableModel.addRow(new String[]{formattedDate, bookData[2], bookData[3], bookData[4]});
         }
 
-        // 行の高さを調整（例えば、テーブル全体の高さが 400px と仮定）
-        int rowHeight = 400 / PAGE_SIZE; // 10行の場合の行高
-        table.setRowHeight(rowHeight);  // 行高さを設定
-
-        // 現在のページ番号を更新
+        table.setRowHeight(400 / PAGE_SIZE);
         currentPage = page;
+
+        // ページネーションパネルを更新
+        getContentPane().remove(getContentPane().getComponentCount() - 1);
+        getContentPane().add(createPaginationPanel(), BorderLayout.SOUTH);
+        revalidate();
+        repaint();
     }
 
-    // NewBookRecord画面を開くメソッド
+    private void filterBooks() {
+        String searchText = searchField.getText().toLowerCase();
+        filteredBookItems.clear();
+
+        for (String[] book : bookItems) {
+            String title = book[2].toLowerCase();
+            String author = book[3].toLowerCase();
+            if (title.contains(searchText) || author.contains(searchText)) {
+                filteredBookItems.add(book);
+            }
+        }
+
+        totalRecordsLabel.setText("Total Records: " + filteredBookItems.size());
+        showPage(0);
+    }
+
+    private String formatDate(String dateStr) {
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = inputFormat.parse(dateStr);
+
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy年M月d日");
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            return dateStr;
+        }
+    }
+
     private void openNewBookRecord() {
         dispose();
         new NewBookRecord().setVisible(true);
     }
 
-    // ShowBookRecordページを開くメソッド
     private void openShowBookRecord(String bookId) {
-        dispose();  // 現在のページを閉じる
-        new ShowBookRecord(bookId).setVisible(true); // IDを渡して新しいページに遷移
+        dispose();
+        new ShowBookRecord(bookId).setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -168,37 +257,38 @@ public class BookRecords extends JFrame {
         });
     }
 
-    // ★を表示するカスタムセルレンダラー
     class StarRatingRenderer extends DefaultTableCellRenderer {
         @Override
         protected void setValue(Object value) {
             if (value instanceof String) {
-                String reviewStr = (String) value;
                 try {
-                    int reviewCount = Integer.parseInt(reviewStr);
-
-                    // ★を表示するためのHTML形式を作成
+                    int reviewCount = Integer.parseInt((String) value);
                     StringBuilder stars = new StringBuilder("<html>");
                     for (int i = 0; i < 5; i++) {
-                        if (i < reviewCount) {
-                            stars.append("<font color='yellow'>★</font>");
-                        } else {
-                            stars.append("<font color='gray'>★</font>");
-                        }
+                        stars.append(i < reviewCount ? "<font color='yellow'>★</font>" : "<font color='gray'>★</font>");
                     }
                     stars.append("</html>");
-
-                    // JLabelにHTMLで表示
-                    JLabel label = new JLabel(stars.toString());
-                    setText(""); // テキストを空にして
-                    setIcon(null); // アイコンもクリア
-                    setHorizontalAlignment(CENTER); // 中央に配置
-                    setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-                    setText(label.getText()); // JLabelのHTMLをセルにセット
+                    setText(stars.toString());
                 } catch (NumberFormatException e) {
                     setText("Invalid review");
                 }
             }
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(CENTER);
+            return comp;
+        }
+    }
+
+    class CenteredCellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(CENTER);
+            return comp;
         }
     }
 }
