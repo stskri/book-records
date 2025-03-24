@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -75,7 +76,15 @@ public class BookRecords extends JFrame {
         getContentPane().setLayout(new BorderLayout());
 
         // 上部パネルの作成 (New Book Recordボタンと総登録件数の表示)
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        // 右側に30ピクセルの余白
+        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
+        
+        // 新規登録ボタン
+        JButton newBookButton = new JButton("New Book Record");
+        newBookButton.addActionListener(e -> openNewBookRecord());
+        topPanel.add(newBookButton);
 
         // 検索バー
         searchField = new JTextField(20);
@@ -95,13 +104,7 @@ public class BookRecords extends JFrame {
                 filterBooks();
             }
         });
-        topPanel.add(new JLabel("Search:"));
         topPanel.add(searchField);
-
-        // 新規登録ボタン
-        JButton newBookButton = new JButton("New Book Record");
-        newBookButton.addActionListener(e -> openNewBookRecord());
-        topPanel.add(newBookButton);
 
         // 総登録件数の表示
         totalRecordsLabel = new JLabel("Total Records: " + filteredBookItems.size());

@@ -58,46 +58,62 @@ public class NewBookRecord extends JFrame {
 
     public NewBookRecord() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 900, 500);
+        setBounds(100, 100, 900, 465);
         contentPane = new JPanel();
         contentPane.setBackground(new Color(255, 255, 255));
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
+        // 戻るボタン（左上に配置）
+        JButton backButton = new JButton("Back to List");
+        backButton.setForeground(new Color(220, 220, 220)); // 淡い黒色
+        backButton.setFont(new Font("SansSerif", Font.BOLD, 14)); // 太字、少し大きい
+        backButton.setBounds(30, 25, 150, 40); // 左上に配置
+        backButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0)); // ボーダー追加
+        backButton.setBackground(null); // 背景色を削除
+
+
+
+        backButton.addActionListener(e -> {
+            dispose();
+            new BookRecords().setVisible(true);
+        });
+        contentPane.add(backButton);
+
         // タイトル入力フィールド
         JLabel titleLabel = new JLabel("Book Title:");
-        titleLabel.setBounds(50, 50, 100, 30);
+        titleLabel.setBounds(100, 85, 75, 30);
         contentPane.add(titleLabel);
 
         titleField = new JTextField();
-        titleField.setBounds(150, 50, 600, 30);  // 幅をウィンドウに合わせて調整
-        Border border = BorderFactory.createLineBorder(new Color(211, 211, 211), 2); // 灰色の太めのボーダー
+        titleField.setBounds(185, 85, 600, 30);  // 幅をウィンドウに合わせて調整
+        Border border = BorderFactory.createLineBorder(new Color(230, 230, 230), 2); // 灰色の太めのボーダー
         Border margin = BorderFactory.createEmptyBorder(0, 10, 0, 10); // 左右に余白
         titleField.setBorder(BorderFactory.createCompoundBorder(border, margin)); // ボーダーと余白を結合
         contentPane.add(titleField);
 
-     // 作者入力フィールド
+        // 作者入力フィールド
         JLabel authorLabel = new JLabel("Author:");
-        authorLabel.setBounds(50, 100, 100, 30);
+        authorLabel.setBounds(100, 135, 75, 30);
         contentPane.add(authorLabel);
 
         authorField = new JTextField();
-        authorField.setBounds(150, 100, 600, 30);  // 幅をウィンドウに合わせて調整
-        Border authorBorder = BorderFactory.createLineBorder(new Color(211, 211, 211), 2); // 灰色の太めのボーダー
+        authorField.setBounds(185, 135, 600, 30);  // 幅をウィンドウに合わせて調整
+        Border authorBorder = BorderFactory.createLineBorder(new Color(230, 230, 230), 2); // 灰色の太めのボーダー
         Border authorMargin = BorderFactory.createEmptyBorder(0, 10, 0, 10); // 左右に余白
         authorField.setBorder(BorderFactory.createCompoundBorder(authorBorder, authorMargin)); // ボーダーと余白を結合
         contentPane.add(authorField);
 
         // 星評価のラベル
         JLabel reviewLabel = new JLabel("Review:");
-        reviewLabel.setBounds(50, 150, 100, 30);
+        reviewLabel.setBounds(100, 185, 75, 30);
         contentPane.add(reviewLabel);
 
         // 星アイコンを配置
         for (int i = 0; i < 5; i++) {
-            stars[i] = new JLabel("☆");
+            stars[i] = new JLabel("★");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
-            stars[i].setBounds(150 + (i * 40), 140, 40, 40);
+            stars[i].setBounds(185 + (i * 40), 180, 40, 40);
             stars[i].setForeground(Color.GRAY); // 初期は灰色
             contentPane.add(stars[i]);
 
@@ -122,42 +138,33 @@ public class NewBookRecord extends JFrame {
             });
         }
 
-     // 感想入力エリア
+        // 感想入力エリア
         JLabel reviewTextLabel = new JLabel("Review Text:");
-        reviewTextLabel.setBounds(50, 200, 100, 30);
+        reviewTextLabel.setBounds(100, 235, 75, 30);
         contentPane.add(reviewTextLabel);
 
+        // JTextAreaのボーダー内に余白を設定
         reviewTextArea = new JTextArea();
-        reviewTextArea.setBounds(150, 200, 600, 100);
+        reviewTextArea.setBounds(150, 250, 600, 100);
         reviewTextArea.setLineWrap(true); // 自動改行を有効にする
         reviewTextArea.setWrapStyleWord(true); // 単語単位で改行
-        contentPane.add(reviewTextArea);
-        
+
+        // ボーダーと余白を設定
+        Border reviewTextBorder = BorderFactory.createLineBorder(new Color(255, 255, 255), 0); // ボーダー
+        Border reviewTextMargin = BorderFactory.createEmptyBorder(5, 10, 5, 10); // 上下、左右に均等な余白
+        reviewTextArea.setBorder(BorderFactory.createCompoundBorder(reviewTextBorder, reviewTextMargin)); // ボーダーと余白を結合
+
         // スクロールペインを作成して、JTextAreaをその中に配置
         JScrollPane scrollPane = new JScrollPane(reviewTextArea);
-        scrollPane.setBounds(150, 200, 600, 100);
-        // スクロールペインのボーダーを削除
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        // ビューのボーダーを設定（JScrollPaneが持つビューのボーダーを設定）
-        scrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(211, 211, 211), 2));
-        // スクロールペインをコンテンツパネルに追加
+        scrollPane.setBounds(185, 235, 600, 100);  // 幅をウィンドウに合わせて調整
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());  // スクロールペインのボーダーを削除
+        scrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2));  // ビューのボーダーを設定
         contentPane.add(scrollPane);
-        
-        // 保存ボタン
-        JButton saveButton = new JButton("Save Record");
-        saveButton.setBounds(50, 350, 150, 40);
-        contentPane.add(saveButton);
 
-        // 戻るボタン
-        JButton backButton = new JButton("Back to List");
-        backButton.setBackground(new Color(70, 130, 180));
-        backButton.setForeground(Color.WHITE);
-        backButton.setBounds(255, 350, 150, 40);
-        backButton.addActionListener(e -> {
-            dispose();
-            new BookRecords().setVisible(true);
-        });
-        contentPane.add(backButton);
+        // 保存ボタン（中央配置）
+        JButton saveButton = new JButton("Save Record");
+        saveButton.setBounds(375, 360, 150, 40); // 中央配置
+        contentPane.add(saveButton);
 
         saveButton.addActionListener(e -> {
             String title = titleField.getText();
@@ -205,64 +212,58 @@ public class NewBookRecord extends JFrame {
         setReviewStars(selectedReview);
     }
 
-    // 星をハイライトするメソッド
-    private void highlightStars(int count) {
+    private void setReviewStars(int rating) {
         for (int i = 0; i < 5; i++) {
-            if (i < count) {
-                stars[i].setText("★");
-                stars[i].setForeground(Color.YELLOW);
+            if (i < rating) {
+                stars[i].setForeground(Color.YELLOW); // 黄色に変更
             } else {
-                stars[i].setText("☆");
-                stars[i].setForeground(Color.GRAY);
+                stars[i].setForeground(Color.GRAY); // 灰色に変更
+            }
+        }
+        selectedReview = rating;
+    }
+
+    private void highlightStars(int rating) {
+        for (int i = 0; i < 5; i++) {
+            if (i < rating) {
+                stars[i].setForeground(Color.YELLOW); // 黄色に変更
+            } else {
+                stars[i].setForeground(Color.GRAY); // 灰色に変更
             }
         }
     }
 
-    // 星の選択を確定するメソッド
-    private void setReviewStars(int count) {
-        selectedReview = count;
-        highlightStars(count);
-    }
-
-    // 書籍データをCSVに保存
     private void saveBookRecord(String title, String author, int review, String reviewText) {
-        try {
-            int nextId = calculateNextId();
-            String formattedId = String.format("%08d", nextId);
-            String timestamp = getCurrentTimestamp();
-
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("book_records.csv", true), "UTF-8"))) {
-                writer.write(formattedId + "," + timestamp + "," + title + "," + author + "," + review + "," + reviewText);
-                writer.newLine();
+        // CSV保存処理（仮）
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("book_records.csv", true), "UTF-8"))) {
+            // CSVファイルの内容を読み込んで最新のIDを取得
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("book_records.csv"), "UTF-8"));
+            String lastLine = null;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lastLine = line;
             }
+            reader.close();
+
+            // 最新のIDを抽出し、次のIDを計算
+            int nextId = 1;
+            if (lastLine != null) {
+                String[] lastRecord = lastLine.split(",");
+                nextId = Integer.parseInt(lastRecord[0].trim()) + 1;
+            }
+
+            // IDを8桁で0詰め
+            String id = String.format("%08d", nextId);
+
+            // 現在の時間を取得
+            LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Tokyo"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedTime = currentTime.format(formatter);
+
+            // CSVに書き込む（半角スペースを削除）
+            writer.write(String.format("%s,%s,%s,%s,%d,%s%n", id, formattedTime, title, author, review, reviewText));
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error saving the record.");
         }
-    }
-
-    // 次のIDを計算するメソッド
-    private int calculateNextId() {
-        int nextId = 1;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("book_records.csv"), "UTF-8"))) {
-            String line;
-            String lastId = "";
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length > 0) lastId = data[0];
-            }
-            if (!lastId.isEmpty()) {
-                nextId = Integer.parseInt(lastId) + 1;
-            }
-        } catch (IOException e) {
-            System.out.println("No previous records found, starting from ID = 1.");
-        }
-        return nextId;
-    }
-
-    // 現在の東京時刻を取得
-    private String getCurrentTimestamp() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return LocalDateTime.now(ZoneId.of("Asia/Tokyo")).format(formatter);
     }
 }

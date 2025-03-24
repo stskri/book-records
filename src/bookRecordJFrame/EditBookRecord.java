@@ -131,7 +131,7 @@ public class EditBookRecord extends JFrame {
 
         // 保存ボタン
         JButton saveButton = new JButton("変更を保存");
-        saveButton.setBounds(120, 380, 150, 40);
+        saveButton.setBounds(120, 397, 150, 40);
         saveButton.setBackground(new Color(0, 204, 0));  // 緑
         saveButton.setForeground(Color.WHITE);
         saveButton.addActionListener(new ActionListener() {
@@ -187,7 +187,7 @@ public class EditBookRecord extends JFrame {
 
         // 戻るボタン
         JButton backButton = new JButton("戻る");
-        backButton.setBounds(300, 380, 150, 40);
+        backButton.setBounds(320, 397, 150, 40);
         backButton.setBackground(new Color(100, 149, 237));  // 青
         backButton.setForeground(Color.WHITE);
         backButton.addActionListener(new ActionListener() {
@@ -200,7 +200,7 @@ public class EditBookRecord extends JFrame {
 
         // 削除ボタン
         JButton deleteButton = new JButton("書籍を削除");
-        deleteButton.setBounds(480, 380, 150, 40);
+        deleteButton.setBounds(520, 397, 150, 40);
         deleteButton.setBackground(new Color(255, 0, 0));  // 赤
         deleteButton.setForeground(Color.WHITE);
         deleteButton.addActionListener(new ActionListener() {
