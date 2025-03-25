@@ -69,7 +69,6 @@ public class ShowBookRecord extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         
         JLabel errorLabel = new JLabel("Error: Book not found.");
-        errorLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
         errorLabel.setForeground(Color.RED);
         panel.add(errorLabel);
         
@@ -92,19 +91,16 @@ public class ShowBookRecord extends JFrame {
         
         // 日付ラベル
         JLabel dateLabel = new JLabel("Registration Date: " + formattedDate);
-        dateLabel.setFont(new Font("メイリオ", Font.PLAIN, 14));
         gbc.insets = new Insets(5, 0, 15, 0);
         panel.add(dateLabel, gbc);
         
         // タイトルラベル
         JLabel titleLabel = new JLabel(bookData[2]);
-        titleLabel.setFont(new Font("メイリオ", Font.BOLD, 24));
         gbc.insets = new Insets(0, 0, 5, 0);
         panel.add(titleLabel, gbc);
         
         // 著者ラベル - "by" を削除
         JLabel authorLabel = new JLabel(bookData[3]);
-        authorLabel.setFont(new Font("メイリオ", Font.ITALIC, 16));
         gbc.insets = new Insets(0, 0, 15, 0);
         panel.add(authorLabel, gbc);
         
@@ -113,19 +109,17 @@ public class ShowBookRecord extends JFrame {
         gbc.insets = new Insets(0, 0, 20, 0);
         panel.add(ratingPanel, gbc);
         
-        // 思考セクションラベル - "Reader's Notes"を"感想"に変更
+        // 感想セクションラベル
         JLabel thoughtsLabel = new JLabel("感想");
-        thoughtsLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
         gbc.insets = new Insets(0, 0, 10, 0);
         panel.add(thoughtsLabel, gbc);
         
-        // 思考テキストエリア
+        // 感想テキストエリア
         JTextArea thoughtsArea = new JTextArea(bookData[5]);
         thoughtsArea.setWrapStyleWord(true);
         thoughtsArea.setLineWrap(true);
         thoughtsArea.setCaretPosition(0);
         thoughtsArea.setEditable(false);
-        thoughtsArea.setFont(new Font("メイリオ", Font.PLAIN, 14));
         thoughtsArea.setBackground(new Color(245, 245, 250));
         thoughtsArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
@@ -166,7 +160,6 @@ public class ShowBookRecord extends JFrame {
             }
         } catch (NumberFormatException e) {
             JLabel ratingLabel = new JLabel(rating + "/5");
-            ratingLabel.setFont(new Font("メイリオ", Font.PLAIN, 16));
             panel.add(ratingLabel);
         }
         
@@ -175,7 +168,7 @@ public class ShowBookRecord extends JFrame {
     
     private JPanel createButtonPanel(String[] bookData) {
         JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(220, 220, 220)),
             BorderFactory.createEmptyBorder(10, 0, 10, 0)
@@ -183,10 +176,9 @@ public class ShowBookRecord extends JFrame {
         
         // 編集ボタン
         JButton editButton = new JButton("Edit Book Record");
-        editButton.setFont(new Font("メイリオ", Font.BOLD, 14));
-        editButton.setBackground(buttonColor);
-        editButton.setForeground(Color.WHITE);
+        editButton.setBackground(Color.white);
         editButton.setFocusPainted(false);
+        editButton.setPreferredSize(new Dimension(150, 30)); // 固定サイズ設定
         editButton.addActionListener((ActionEvent e) -> {
             dispose();
             new EditBookRecord(bookData).setVisible(true);
@@ -194,9 +186,8 @@ public class ShowBookRecord extends JFrame {
         
         // 戻るボタン
         JButton backButton = new JButton("Back to List");
-        backButton.setFont(new Font("メイリオ", Font.BOLD, 14));
-        backButton.setBackground(buttonColor);
-        backButton.setForeground(Color.WHITE);
+        backButton.setBackground(Color.white);
+        backButton.setForeground(Color.gray);
         backButton.setFocusPainted(false);
         backButton.addActionListener((ActionEvent e) -> {
             dispose();

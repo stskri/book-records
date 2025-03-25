@@ -1,6 +1,7 @@
 package bookRecordJFrame;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -23,6 +24,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -40,7 +42,7 @@ public class BookRecords extends JFrame {
 
     public BookRecords() {
         setTitle("Book Records");
-        setBounds(100, 100, 900, 500);
+        setBounds(100, 100, 900, 575);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         bookItems = new ArrayList<>();
@@ -55,7 +57,38 @@ public class BookRecords extends JFrame {
         tableModel = new DefaultTableModel(columnNames, 0);
         table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        // テーブルヘッダー用のカスタムレンダラー
+        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, 
+                                                           boolean isSelected, boolean hasFocus, 
+                                                           int row, int column) {
+                // デフォルトのヘッダーレンダラーを使用
+                Component comp = super.getTableCellRendererComponent(table, value, 
+                                                                     isSelected, hasFocus, 
+                                                                     row, column);
+                
+                // ヘッダーの背景色を固定
+                comp.setBackground(UIManager.getColor("TableHeader.background"));
+                setHorizontalAlignment(CENTER);
+                
+                return comp;
+            }
+        });
+        
+        // 列の幅を調整
+        table.getColumnModel().getColumn(0).setPreferredWidth(200); // Registration Date列
+        table.getColumnModel().getColumn(1).setPreferredWidth(300); // Title列
+        table.getColumnModel().getColumn(2).setPreferredWidth(200); // Author列
+        table.getColumnModel().getColumn(3).setPreferredWidth(200); // Review列
+        
+        // RGB値(240, 240, 240)で色を指定
+        Color tableHedderColor = new Color(240, 240, 240);
 
+        // ヘッダー部分に下線を追加
+        table.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, tableHedderColor));
+        
         // 日付の列を中央揃え
         table.getColumnModel().getColumn(0).setCellRenderer(new CenteredCellRenderer());
 
@@ -76,18 +109,24 @@ public class BookRecords extends JFrame {
         getContentPane().setLayout(new BorderLayout());
 
         // 上部パネルの作成 (New Book Recordボタンと総登録件数の表示)
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBorder(BorderFactory.createEmptyBorder(15, 30, 10, 20));
 
-        // 右側に30ピクセルの余白
-        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 20));
-        
-        // 新規登録ボタン
+        // New Book Recordボタンを左寄せ
         JButton newBookButton = new JButton("New Book Record");
         newBookButton.addActionListener(e -> openNewBookRecord());
-        topPanel.add(newBookButton);
+        newBookButton.setBackground(Color.white);
 
-        // 検索バー
+        Border newBookBorder = BorderFactory.createLineBorder(new Color(230, 230, 230), 2);
+        Border newBookMargin = BorderFactory.createEmptyBorder(0, 10, 0, 10);
+        newBookButton.setBorder(BorderFactory.createCompoundBorder(newBookBorder, newBookMargin)); // ボーダーと余白を結合
+        newBookButton.setPreferredSize(new Dimension(150, 40)); // サイズを150x40に設定
+        topPanel.add(newBookButton, BorderLayout.WEST);
+
+        // 検索バーと総登録件数を右寄せ
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         searchField = new JTextField(20);
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) {
@@ -104,17 +143,42 @@ public class BookRecords extends JFrame {
                 filterBooks();
             }
         });
-        topPanel.add(searchField);
+        
+        rightPanel.add(searchField);
 
-        // 総登録件数の表示
-        totalRecordsLabel = new JLabel("Total Records: " + filteredBookItems.size());
-        topPanel.add(totalRecordsLabel);
+        totalRecordsLabel = new JLabel(filteredBookItems.size()  + "件");
+        rightPanel.add(totalRecordsLabel);
+
+        topPanel.add(rightPanel, BorderLayout.EAST);
 
         getContentPane().add(topPanel, BorderLayout.NORTH);
         getContentPane().add(new JScrollPane(table), BorderLayout.CENTER);
         getContentPane().add(createPaginationPanel(), BorderLayout.SOUTH);
 
-        showPage(currentPage);
+        showPage(currentPage);// マウスホバー効果を追加
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                // 選択されている行でない場合にマウスホバーエフェクトを追加
+                if (!isSelected) {
+                    comp.setBackground(table.getMousePosition() != null && 
+                                       table.rowAtPoint(table.getMousePosition()) == row 
+                                       ? new Color(240, 240, 240)  // ホバー時の背景色（薄いグレー）
+                                       : Color.WHITE);  // デフォルトの背景色
+                }
+                return comp;
+            }
+        });
+
+        // マウスモーションリスナーを追加してテーブルを再描画
+        table.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                table.repaint();
+            }
+        });
     }
 
     private JPanel createPaginationPanel() {
@@ -132,7 +196,7 @@ public class BookRecords extends JFrame {
         paginationPanel.add(prevButton);
 
         // 3. ページ番号ボタンを表示（Google風に）
-        int displayPages = 7; // 9から7に減らす
+        int displayPages = 7;
         int startPage = Math.max(0, Math.min(currentPage - displayPages / 2, totalPages - displayPages));
         int endPage = Math.min(startPage + displayPages, totalPages);
 
@@ -281,6 +345,15 @@ public class BookRecords extends JFrame {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            
+            // 選択されていない場合にのみ背景色を変更
+            if (!isSelected) {
+                comp.setBackground(table.getMousePosition() != null && 
+                                   table.rowAtPoint(table.getMousePosition()) == row 
+                                   ? new Color(240, 240, 240)  // ホバー時の背景色（薄いグレー）
+                                   : Color.WHITE);  // デフォルトの背景色
+            }
+            
             setHorizontalAlignment(CENTER);
             return comp;
         }
@@ -290,6 +363,15 @@ public class BookRecords extends JFrame {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            
+            // 選択されていない場合にのみ背景色を変更
+            if (!isSelected) {
+                comp.setBackground(table.getMousePosition() != null && 
+                                   table.rowAtPoint(table.getMousePosition()) == row 
+                                   ? new Color(240, 240, 240)  // ホバー時の背景色（薄いグレー）
+                                   : Color.WHITE);  // デフォルトの背景色
+            }
+            
             setHorizontalAlignment(CENTER);
             return comp;
         }

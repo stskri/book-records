@@ -44,18 +44,15 @@ public class EditBookRecord extends JFrame {
 
         // IDと登録日表示
         JLabel idLabel = new JLabel("ID: " + bookData[0]);
-        idLabel.setFont(new Font("メイリオ", Font.PLAIN, 12));
         idLabel.setBounds(20, 20, 100, 30);
         panel.add(idLabel);
 
         JLabel dateLabel = new JLabel("登録日: " + bookData[1]);
-        dateLabel.setFont(new Font("メイリオ", Font.PLAIN, 12));
         dateLabel.setBounds(130, 20, 200, 30);
         panel.add(dateLabel);
 
         // タイトル入力欄
         JLabel titleLabel = new JLabel("タイトル:");
-        titleLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
         titleLabel.setBounds(20, 70, 100, 30);
         panel.add(titleLabel);
 
@@ -65,7 +62,6 @@ public class EditBookRecord extends JFrame {
 
         // 著者入力欄
         JLabel authorLabel = new JLabel("著者:");
-        authorLabel.setFont(new Font("メイリオ", Font.BOLD, 16)); 
         authorLabel.setBounds(20, 120, 100, 30);
         panel.add(authorLabel);
 
@@ -75,7 +71,6 @@ public class EditBookRecord extends JFrame {
 
         // 星評価入力欄
         JLabel reviewLabel = new JLabel("レビュー:");
-        reviewLabel.setFont(new Font("メイリオ", Font.BOLD, 16));
         reviewLabel.setBounds(20, 170, 150, 30);
         panel.add(reviewLabel);
 
@@ -84,7 +79,7 @@ public class EditBookRecord extends JFrame {
         // 星評価を表示するラベルの配列
         int starXPosition = 120;  // 星評価のX位置
         for (int i = 0; i < 5; i++) {
-            stars[i] = new JLabel("☆");
+            stars[i] = new JLabel("★");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));  // 星のサイズ
             stars[i].setBounds(starXPosition + (i * 40), 160, 40, 40);  // 星のX位置を変更
             stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
@@ -117,14 +112,12 @@ public class EditBookRecord extends JFrame {
 
         // 感想入力欄
         JLabel thoughtsLabel = new JLabel("感想:");
-        thoughtsLabel.setFont(new Font("メイリオ", Font.BOLD, 16)); 
         thoughtsLabel.setBounds(20, 220, 100, 30);
         panel.add(thoughtsLabel);
 
         thoughtsArea = new JTextArea(bookData[5]);
         thoughtsArea.setWrapStyleWord(true);
         thoughtsArea.setLineWrap(true);
-        thoughtsArea.setFont(new Font("メイリオ", Font.PLAIN, 14)); 
         JScrollPane scrollPane = new JScrollPane(thoughtsArea);
         scrollPane.setBounds(120, 220, 550, 150);
         panel.add(scrollPane);

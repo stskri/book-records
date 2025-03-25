@@ -1,6 +1,7 @@
 package bookRecordJFrame;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.io.BufferedReader;
@@ -64,15 +65,23 @@ public class NewBookRecord extends JFrame {
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
-        // 戻るボタン（左上に配置）
+     // 戻るボタン（左上に配置）
         JButton backButton = new JButton("Back to List");
         backButton.setForeground(new Color(220, 220, 220)); // 淡い黒色
         backButton.setFont(new Font("SansSerif", Font.BOLD, 14)); // 太字、少し大きい
-        backButton.setBounds(30, 25, 150, 40); // 左上に配置
+        backButton.setPreferredSize(new Dimension(150, 40)); // ボタンのサイズを設定
+        backButton.setBackground(new Color(245, 245, 245)); // 背景色を設定
         backButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0)); // ボーダー追加
-        backButton.setBackground(null); // 背景色を削除
 
+        backButton.addActionListener(e -> {
+            dispose();
+            new BookRecords().setVisible(true);
+        });
 
+        // レイアウトマネージャを使用してボタンを配置する
+        contentPane.setLayout(null); // レイアウトを無効化して手動配置
+        contentPane.add(backButton);
+        backButton.setBounds(30, 25, 150, 40); // 左上に配置
 
         backButton.addActionListener(e -> {
             dispose();
