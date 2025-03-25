@@ -212,7 +212,7 @@ public class NewBookRecord extends JFrame {
 
             // 保存処理
             saveBookRecord(title, author, selectedReview, reviewText);
-            JOptionPane.showMessageDialog(null, "Record saved successfully!");
+            JOptionPane.showMessageDialog(null, "登録が完了しました！");
             dispose();
             new BookRecords().setVisible(true);
         });
