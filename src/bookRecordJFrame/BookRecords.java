@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -29,6 +28,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 public class BookRecords extends JFrame {
     private static final int PAGE_SIZE = 10;
@@ -228,19 +229,14 @@ public class BookRecords extends JFrame {
 
     private void loadBooksFromCSV() {
         bookItems.clear();
-        try (BufferedReader br = new BufferedReader(new FileReader("book_records.csv"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 6) {
-                    // 各要素をアンエスケープ
-                    for (int i = 0; i < data.length; i++) {
-                        data[i] = unescapeCSV(data[i]);
-                    }
-                    bookItems.add(data);
+        try (CSVReader reader = new CSVReader(new FileReader("book_records.csv"))) {
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                if (nextLine.length == 6) {
+                    bookItems.add(nextLine);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | CsvValidationException e) {
             e.printStackTrace();
         }
 
@@ -250,22 +246,6 @@ public class BookRecords extends JFrame {
         // フィルタリング用にfilteredBookItemsをセット
         filteredBookItems.clear();
         filteredBookItems.addAll(bookItems);
-    }
-
-    private String unescapeCSV(String input) {
-        if (input == null) {
-            return "";
-        }
-        // 前後のダブルクォーテーションを削除
-        if (input.startsWith("\"") && input.endsWith("\"")) {
-            input = input.substring(1, input.length() - 1);
-        }
-        // エスケープされた改行文字を実際の改行文字に戻す
-        input = input.replace("\\r\\n", "\r\n")
-                     .replace("\\n", "\n")
-                     .replace("\\r", "\r")
-                     .replace("\"\"", "\"");
-        return input;
     }
 
     private void showPage(int page) {

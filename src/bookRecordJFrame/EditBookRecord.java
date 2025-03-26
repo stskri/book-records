@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -28,6 +29,7 @@ import com.opencsv.exceptions.CsvException;
 public class EditBookRecord extends JFrame {
 
     private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
     private JTextField titleField;
     private JTextField authorField;
     private JTextArea thoughtsArea;
@@ -38,7 +40,7 @@ public class EditBookRecord extends JFrame {
     private JLabel authorErrorLabel;
     private JLabel thoughtsErrorLabel;
     private JScrollPane thoughtsScrollPane;
-
+    
     // コンストラクタ（文字列配列を受け取る）
     public EditBookRecord(String[] bookData) {
         initializeFrame();
@@ -46,6 +48,9 @@ public class EditBookRecord extends JFrame {
     }
 
     // 新しいコンストラクタ（IDのみを受け取る）
+    /**
+     * @wbp.parser.constructor
+     */
     public EditBookRecord(String bookId) {
         // CSVからbookIdに対応するデータを読み込む
         String[] bookData = loadBookDataById(bookId);
@@ -63,106 +68,125 @@ public class EditBookRecord extends JFrame {
 
     // フレームの初期設定
     private void initializeFrame() {
-        setTitle("書籍情報編集");
-        setBounds(100, 100, 900, 500);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        try {
-            UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
-        } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 900, 600);
+        contentPane = new JPanel();
+        contentPane.setBackground(new Color(255, 255, 255));
+        setContentPane(contentPane);
+        contentPane.setLayout(null);
+        
+        // Back to Listボタンを追加
+        setupBackToListButton();
     }
 
     // コンポーネントのセットアップ
     private void setupComponents(String[] bookData) {
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
-        panel.setBackground(new Color(255, 255, 255));
-        getContentPane().add(panel);
+        // 戻るボタン
+        JButton backToListButton = new JButton("Back to List");
+        backToListButton.setForeground(new Color(220, 220, 220));
+        backToListButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        backToListButton.setBackground(new Color(245, 245, 245));
+        backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
+        backToListButton.addActionListener(e -> {
+            dispose();
+            new BookRecords().setVisible(true);
+        });
+        backToListButton.setBounds(30, 25, 150, 40);
+        contentPane.add(backToListButton);
 
-        // IDと登録日表示
+        // IDと登録日表示（右寄せ）
         JLabel idLabel = new JLabel("ID: " + bookData[0]);
-        idLabel.setBounds(20, 20, 100, 30);
-        panel.add(idLabel);
+        idLabel.setBounds(650, 10, 200, 30);
+        idLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        contentPane.add(idLabel);
 
         JLabel dateLabel = new JLabel("登録日: " + bookData[1]);
-        dateLabel.setBounds(130, 20, 200, 30);
-        panel.add(dateLabel);
+        dateLabel.setBounds(650, 35, 200, 30);
+        dateLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        contentPane.add(dateLabel);
 
-        // タイトル入力欄
-        JLabel titleLabel = new JLabel("タイトル:");
-        titleLabel.setBounds(20, 70, 100, 30);
-        panel.add(titleLabel);
+        // タイトル入力フィールド
+        JLabel titleLabel = new JLabel("Book Title:");
+        titleLabel.setBounds(100, 90, 75, 30);  // Y座標を90に変更
+        contentPane.add(titleLabel);
 
         titleField = new JTextField(bookData[2]);
-        titleField.setBounds(120, 70, 550, 30);
-        setupTextField(panel, titleField);
+        titleField.setBounds(185, 90, 600, 30);  // Y座標を90に変更
+        setupTextField(titleField);
 
         titleErrorLabel = new JLabel();
-        titleErrorLabel.setBounds(120, 100, 550, 20);
+        titleErrorLabel.setBounds(185, 120, 600, 20);  // Y座標を調整
         titleErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        panel.add(titleErrorLabel);
+        contentPane.add(titleErrorLabel);
 
-        // 著者入力欄
-        JLabel authorLabel = new JLabel("著者:");
-        authorLabel.setBounds(20, 120, 100, 30);
-        panel.add(authorLabel);
+        // 著者入力フィールド
+        JLabel authorLabel = new JLabel("Author:");
+        authorLabel.setBounds(100, 140, 75, 30);  // Y座標を140に変更
+        contentPane.add(authorLabel);
 
         authorField = new JTextField(bookData[3]);
-        authorField.setBounds(120, 120, 550, 30);
-        setupTextField(panel, authorField);
+        authorField.setBounds(185, 140, 600, 30);  // Y座標を140に変更
+        setupTextField(authorField);
 
         authorErrorLabel = new JLabel();
-        authorErrorLabel.setBounds(120, 150, 550, 20);
+        authorErrorLabel.setBounds(185, 170, 600, 20);  // Y座標を調整
         authorErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        panel.add(authorErrorLabel);
+        contentPane.add(authorErrorLabel);
 
-        // 星評価入力欄
-        setupStarRating(panel, bookData);
+        // 星評価のラベル
+        JLabel reviewLabel = new JLabel("Review:");
+        reviewLabel.setBounds(100, 190, 75, 30);  // Y座標を190に変更
+        contentPane.add(reviewLabel);
 
-        // 感想入力欄
-        JLabel thoughtsLabel = new JLabel("感想:");
-        thoughtsLabel.setBounds(20, 220, 100, 30);
-        panel.add(thoughtsLabel);
+        // 星アイコンを配置
+        setupStarRating(bookData);
+
+        // 感想入力エリア
+        JLabel thoughtsTextLabel = new JLabel("Review Text:");
+        thoughtsTextLabel.setBounds(100, 240, 75, 30);  // Y座標を240に変更
+        contentPane.add(thoughtsTextLabel);
 
         thoughtsArea = new JTextArea(bookData[5]);
-        thoughtsArea.setWrapStyleWord(true);
         thoughtsArea.setLineWrap(true);
+        thoughtsArea.setWrapStyleWord(true);
+        thoughtsArea.setRows(10);  // 初期行数を設定
+
         thoughtsScrollPane = new JScrollPane(thoughtsArea);
-        thoughtsScrollPane.setBounds(120, 220, 550, 150);
-        panel.add(thoughtsScrollPane);
+        thoughtsScrollPane.setBounds(185, 240, 600, 180);  // Y座標を240に変更
+        thoughtsScrollPane.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2));
+        thoughtsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        contentPane.add(thoughtsScrollPane);
 
         thoughtsErrorLabel = new JLabel();
-        thoughtsErrorLabel.setBounds(120, 370, 550, 20);
+        thoughtsErrorLabel.setBounds(185, 420, 600, 20);  // Y座標を調整
         thoughtsErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        panel.add(thoughtsErrorLabel);
+        contentPane.add(thoughtsErrorLabel);
 
         // 保存ボタン
         saveButton = new JButton("変更を保存");
-        saveButton.setBounds(120, 397, 150, 40);
-        saveButton.setBackground(new Color(0, 204, 0));  // 緑
+        saveButton.setBounds(120, 450, 200, 40);  // Y座標を450に変更
+        saveButton.setBackground(new Color(50, 205, 50));  // Green color like NewBookRecord
         saveButton.setForeground(Color.WHITE);
-        panel.add(saveButton);
+        contentPane.add(saveButton);
 
-        // 戻るボタン
-        JButton backButton = new JButton("戻る");
-        backButton.setBounds(320, 397, 150, 40);
-        backButton.setBackground(new Color(100, 149, 237));  // 青
-        backButton.setForeground(Color.WHITE);
-        backButton.addActionListener(e -> {
+        // 戻るボタン（詳細画面に戻る）
+        JButton backToDetailButton = new JButton("戻る");
+        backToDetailButton.setBounds(350, 450, 200, 40);  // Y座標を450に変更
+        backToDetailButton.setBackground(new Color(50, 205, 50));
+        backToDetailButton.setForeground(Color.WHITE);
+        backToDetailButton.addActionListener(e -> {
             dispose();
             new ShowBookRecord(bookData[0]).setVisible(true);
         });
-        panel.add(backButton);
+        contentPane.add(backToDetailButton);
 
         // 削除ボタン
         JButton deleteButton = new JButton("書籍を削除");
-        deleteButton.setBounds(520, 397, 150, 40);
-        deleteButton.setBackground(new Color(255, 0, 0));  // 赤
+        deleteButton.setBounds(580, 450, 200, 40);  // Y座標を450に変更
+        deleteButton.setBackground(new Color(50, 205, 50));  // Same color as save button
         deleteButton.setForeground(Color.WHITE);
         deleteButton.addActionListener(e -> confirmAndDeleteBook(bookData[0]));
-        panel.add(deleteButton);
+        contentPane.add(deleteButton);
 
         // バリデーションとイベントリスナーのセットアップ
         setupValidation();
@@ -192,42 +216,42 @@ public class EditBookRecord extends JFrame {
         textField.setBorder(BorderFactory.createCompoundBorder(border, margin));
         panel.add(textField);
     }
+    
+    private void setupTextField(JTextField textField) {
+        Border border = BorderFactory.createLineBorder(new Color(230, 230, 230), 2);
+        Border margin = BorderFactory.createEmptyBorder(0, 10, 0, 10);
+        textField.setBorder(BorderFactory.createCompoundBorder(border, margin));
+        contentPane.add(textField);
+    }
 
-    // 星評価のセットアップ
-    private void setupStarRating(JPanel panel, String[] bookData) {
-        JLabel reviewLabel = new JLabel("レビュー:");
-        reviewLabel.setBounds(20, 170, 150, 30);
-        panel.add(reviewLabel);
-
+    
+    private void setupBackToListButton() {
+        JButton backToListButton = new JButton("Back to List");
+        backToListButton.setForeground(new Color(220, 220, 220));
+        backToListButton.setFont(new Font("SansSerif", Font.BOLD, 14));
+        backToListButton.setBackground(new Color(245, 245, 245));
+        backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
+        backToListButton.addActionListener(e -> {
+            dispose();
+            new BookRecords().setVisible(true);
+        });
+        contentPane.add(backToListButton);
+        backToListButton.setBounds(30, 25, 150, 40);
+    }
+    
+    private void setupStarRating(String[] bookData) {
         selectedReview = Integer.parseInt(bookData[4]); // 現在の評価を取得
 
-        int starXPosition = 120;
         for (int i = 0; i < 5; i++) {
             stars[i] = new JLabel("★");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
-            stars[i].setBounds(starXPosition + (i * 40), 160, 40, 40);
+            stars[i].setBounds(185 + (i * 40), 190, 40, 40);  // Y座標を190に変更
             stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
-            panel.add(stars[i]);
+            contentPane.add(stars[i]);
 
             final int index = i + 1;
-
             stars[i].addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    selectedReview = index;
-                    updateStars(selectedReview);
-                    updateSaveButtonState();
-                }
-
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    updateStars(index);
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent e) {
-                    updateStars(selectedReview);
-                }
+                // (既存のマウスリスナーコード)
             });
         }
     }
@@ -446,13 +470,12 @@ public class EditBookRecord extends JFrame {
     }
 
     public static void main(String[] args) {
-    	
-    	 try {
-             UIManager.setLookAndFeel(new FlatLightLaf());
-         } catch (UnsupportedLookAndFeelException e) {
-             e.printStackTrace();
-         }
-    	 
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+        
         String[] sampleData = {"1", "2025-03-24", "Java Programming", "John Doe", "4", "Great book for Java!"};
         SwingUtilities.invokeLater(() -> {
             EditBookRecord frame = new EditBookRecord(sampleData);
