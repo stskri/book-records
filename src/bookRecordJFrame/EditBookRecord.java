@@ -2,9 +2,11 @@ package bookRecordJFrame;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,6 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class EditBookRecord extends JFrame {
 
@@ -25,6 +30,11 @@ public class EditBookRecord extends JFrame {
     private JTextArea thoughtsArea;
     private JLabel[] stars = new JLabel[5];
     private int selectedReview;
+    private JButton saveButton;
+    private JLabel titleErrorLabel;
+    private JLabel authorErrorLabel;
+    private JLabel thoughtsErrorLabel;
+    private JScrollPane thoughtsScrollPane;
 
     public EditBookRecord(String[] bookData) {
         setTitle("書籍情報編集");
@@ -58,7 +68,12 @@ public class EditBookRecord extends JFrame {
 
         titleField = new JTextField(bookData[2]);
         titleField.setBounds(120, 70, 550, 30);
-        panel.add(titleField);
+        setupTextField(panel, titleField);
+
+        titleErrorLabel = new JLabel();
+        titleErrorLabel.setBounds(120, 100, 550, 20);
+        titleErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        panel.add(titleErrorLabel);
 
         // 著者入力欄
         JLabel authorLabel = new JLabel("著者:");
@@ -67,48 +82,15 @@ public class EditBookRecord extends JFrame {
 
         authorField = new JTextField(bookData[3]);
         authorField.setBounds(120, 120, 550, 30);
-        panel.add(authorField);
+        setupTextField(panel, authorField);
+
+        authorErrorLabel = new JLabel();
+        authorErrorLabel.setBounds(120, 150, 550, 20);
+        authorErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        panel.add(authorErrorLabel);
 
         // 星評価入力欄
-        JLabel reviewLabel = new JLabel("レビュー:");
-        reviewLabel.setBounds(20, 170, 150, 30);
-        panel.add(reviewLabel);
-
-        selectedReview = Integer.parseInt(bookData[4]); // 現在の評価を取得
-
-        // 星評価を表示するラベルの配列
-        int starXPosition = 120;  // 星評価のX位置
-        for (int i = 0; i < 5; i++) {
-            stars[i] = new JLabel("★");
-            stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));  // 星のサイズ
-            stars[i].setBounds(starXPosition + (i * 40), 160, 40, 40);  // 星のX位置を変更
-            stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
-            panel.add(stars[i]);
-
-            final int index = i + 1; // 星の番号（1〜5）
-
-            // 星にマウスクリックイベントを追加
-            stars[i].addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    // 評価を変更
-                    selectedReview = index;
-                    updateStars(stars, selectedReview);  // 星を更新
-                }
-
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    // マウスが上に乗ったときに星をハイライト
-                    updateStars(stars, index);
-                }
-
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent e) {
-                    // マウスが外れたときに選択した評価を保持
-                    updateStars(stars, selectedReview);
-                }
-            });
-        }
+        setupStarRating(panel, bookData);
 
         // 感想入力欄
         JLabel thoughtsLabel = new JLabel("感想:");
@@ -118,64 +100,20 @@ public class EditBookRecord extends JFrame {
         thoughtsArea = new JTextArea(bookData[5]);
         thoughtsArea.setWrapStyleWord(true);
         thoughtsArea.setLineWrap(true);
-        JScrollPane scrollPane = new JScrollPane(thoughtsArea);
-        scrollPane.setBounds(120, 220, 550, 150);
-        panel.add(scrollPane);
+        thoughtsScrollPane = new JScrollPane(thoughtsArea);
+        thoughtsScrollPane.setBounds(120, 220, 550, 150);
+        panel.add(thoughtsScrollPane);
+
+        thoughtsErrorLabel = new JLabel();
+        thoughtsErrorLabel.setBounds(120, 370, 550, 20);
+        thoughtsErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        panel.add(thoughtsErrorLabel);
 
         // 保存ボタン
-        JButton saveButton = new JButton("変更を保存");
+        saveButton = new JButton("変更を保存");
         saveButton.setBounds(120, 397, 150, 40);
         saveButton.setBackground(new Color(0, 204, 0));  // 緑
         saveButton.setForeground(Color.WHITE);
-        saveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String title = titleField.getText();
-                String author = authorField.getText();
-                String thoughts = thoughtsArea.getText();
-                int review = selectedReview; // 星評価
-
-                StringBuilder errorMessage = new StringBuilder();
-
-                // 文字数制限チェック
-                if (title.isEmpty()) {
-                    errorMessage.append("タイトルを入力してください。\n");
-                } else if (title.length() < 1 || title.length() > 30) {
-                    errorMessage.append("タイトルは1〜30文字にしてください。\n");
-                }
-
-                if (author.isEmpty()) {
-                    errorMessage.append("著者を入力してください。\n");
-                } else if (author.length() < 1 || author.length() > 15) {
-                    errorMessage.append("著者は1〜15文字にしてください。\n");
-                }
-
-                if (thoughts.isEmpty()) {
-                    errorMessage.append("感想を入力してください。\n");
-                } else if (thoughts.length() < 1 || thoughts.length() > 400) {
-                    errorMessage.append("感想は1〜400文字にしてください。\n");
-                }
-
-                if (errorMessage.length() > 0) {
-                    // エラーメッセージをポップアップで表示
-                    JOptionPane.showMessageDialog(null, errorMessage.toString(), "エラー", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // 更新後の書籍情報を配列に格納
-                String[] updatedBookData = new String[6];
-                updatedBookData[0] = bookData[0];  // ID
-                updatedBookData[1] = bookData[1];  // 日付（変更なし）
-                updatedBookData[2] = authorField.getText();
-                updatedBookData[3] = titleField.getText();
-                updatedBookData[4] = String.valueOf(review);  // 星評価を保存
-                updatedBookData[5] = thoughtsArea.getText();
-
-                CSVUtility.updateBookInCSV(updatedBookData);
-                JOptionPane.showMessageDialog(null, "変更が保存されました！");
-                dispose();
-                new ShowBookRecord(updatedBookData[0]).setVisible(true);
-            }
-        });
         panel.add(saveButton);
 
         // 戻るボタン
@@ -183,11 +121,9 @@ public class EditBookRecord extends JFrame {
         backButton.setBounds(320, 397, 150, 40);
         backButton.setBackground(new Color(100, 149, 237));  // 青
         backButton.setForeground(Color.WHITE);
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                new ShowBookRecord(bookData[0]).setVisible(true);  // 同一IDの詳細ページを開く
-            }
+        backButton.addActionListener(e -> {
+            dispose();
+            new ShowBookRecord(bookData[0]).setVisible(true);
         });
         panel.add(backButton);
 
@@ -196,32 +132,315 @@ public class EditBookRecord extends JFrame {
         deleteButton.setBounds(520, 397, 150, 40);
         deleteButton.setBackground(new Color(255, 0, 0));  // 赤
         deleteButton.setForeground(Color.WHITE);
-        deleteButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // ユーザーに確認
-                int confirm = JOptionPane.showConfirmDialog(null, 
-                    "本当に削除してよろしいですか？", 
-                    "削除確認", 
-                    JOptionPane.YES_NO_OPTION);
-                
-                if (confirm == JOptionPane.YES_OPTION) {
-                    // CSVから削除
-                    CSVUtility.deleteBookFromCSV(bookData[0]);
-                    JOptionPane.showMessageDialog(null, "データが削除されました!");
-
-                    // 編集ウィンドウを閉じる
-                    dispose();
-
-                    // 削除後、書籍一覧画面（BookRecords）に戻る
-                    new BookRecords().setVisible(true);  // BookRecordsの画面に遷移
-                }
-            }
-        });
+        deleteButton.addActionListener(e -> confirmAndDeleteBook(bookData[0]));
         panel.add(deleteButton);
+
+        // バリデーションとイベントリスナーのセットアップ
+        setupValidation();
+        setupSaveButton(bookData);
+    }
+    
+
+ // 新たにIDのみを受け取るコンストラクターを追加
+ public EditBookRecord(String bookId) {
+     // 1. CSVからbookIdに対応するデータを読み込む
+     String[] bookData = loadBookDataById(bookId);
+     
+     if (bookData == null) {
+         // データが見つからない場合のエラーハンドリング
+         JOptionPane.showMessageDialog(null, "書籍データが見つかりませんでした。", "エラー", JOptionPane.ERROR_MESSAGE);
+         dispose();
+         return;
+     }
+
+     // 2. 既存のコンストラクターの処理を呼び出す
+     initializeComponents(bookData);
+ }
+
+ // コンポーネントの初期化メソッドを追加
+ private void initializeComponents(String[] bookData) {
+     // 既存のコンストラクター内の処理をここに移動
+     setTitle("書籍情報編集");
+     setBounds(100, 100, 900, 500);
+     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+     try {
+         UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
+     } catch (UnsupportedLookAndFeelException e) {
+         e.printStackTrace();
+     }
+
+     // 以下、既存のコンストラクター内の処理をそのまま記述
+     // ...（既存のコードをここにコピー）
+ }
+
+ // CSVからデータを読み込むメソッドを追加
+ private String[] loadBookDataById(String bookId) {
+     try (BufferedReader br = new BufferedReader(new FileReader("book_records.csv"))) {
+         String line;
+         while ((line = br.readLine()) != null) {
+             String[] data = line.split(",");
+             if (data.length == 6 && data[0].equals(bookId)) {
+                 // 各要素をアンエスケープ
+                 for (int i = 0; i < data.length; i++) {
+                     data[i] = unescapeCSV(data[i]);
+                 }
+                 return data;
+             }
+         }
+     } catch (IOException e) {
+         e.printStackTrace();
+     }
+     return null;
+ }
+
+ // CSVのアンエスケープメソッドを追加（既存のコードと同様）
+ private String unescapeCSV(String input) {
+     if (input == null) {
+         return "";
+     }
+     // 前後のダブルクォーテーションを削除
+     if (input.startsWith("\"") && input.endsWith("\"")) {
+         input = input.substring(1, input.length() - 1);
+     }
+     // エスケープされた改行文字を実際の改行文字に戻す
+     input = input.replace("\\r\\n", "\r\n")
+                  .replace("\\n", "\n")
+                  .replace("\\r", "\r")
+                  .replace("\"\"", "\"");
+     return input;
+ }
+
+    private void setupTextField(JPanel panel, JTextField textField) {
+        Border border = BorderFactory.createLineBorder(new Color(230, 230, 230), 2);
+        Border margin = BorderFactory.createEmptyBorder(0, 10, 0, 10);
+        textField.setBorder(BorderFactory.createCompoundBorder(border, margin));
+        panel.add(textField);
     }
 
-    // 星の色を更新するメソッド
-    private void updateStars(JLabel[] stars, int review) {
+    private void setupStarRating(JPanel panel, String[] bookData) {
+        JLabel reviewLabel = new JLabel("レビュー:");
+        reviewLabel.setBounds(20, 170, 150, 30);
+        panel.add(reviewLabel);
+
+        selectedReview = Integer.parseInt(bookData[4]); // 現在の評価を取得
+
+        int starXPosition = 120;
+        for (int i = 0; i < 5; i++) {
+            stars[i] = new JLabel("★");
+            stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
+            stars[i].setBounds(starXPosition + (i * 40), 160, 40, 40);
+            stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
+            panel.add(stars[i]);
+
+            final int index = i + 1;
+
+            stars[i].addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    selectedReview = index;
+                    updateStars(selectedReview);
+                    updateSaveButtonState();
+                }
+
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    updateStars(index);
+                }
+
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    updateStars(selectedReview);
+                }
+            });
+        }
+    }
+
+    private void setupValidation() {
+        setupTitleValidation();
+        setupAuthorValidation();
+        setupThoughtsValidation();
+    }
+
+    private void setupTitleValidation() {
+        titleField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                validateTitle();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                validateTitle();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                validateTitle();
+            }
+
+            private void validateTitle() {
+                String title = titleField.getText().trim();
+                if (title.isEmpty()) {
+                    showTitleError("タイトルを入力してください");
+                } else if (title.length() < 1 || title.length() > 30) {
+                    showTitleError("タイトルは1〜30文字にしてください");
+                } else {
+                    clearTitleError();
+                }
+                updateSaveButtonState();
+            }
+        });
+    }
+
+    private void setupAuthorValidation() {
+        authorField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                validateAuthor();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                validateAuthor();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                validateAuthor();
+            }
+
+            private void validateAuthor() {
+                String author = authorField.getText().trim();
+                if (author.isEmpty()) {
+                    showAuthorError("著者を入力してください");
+                } else if (author.length() < 1 || author.length() > 15) {
+                    showAuthorError("著者は1〜15文字にしてください");
+                } else {
+                    clearAuthorError();
+                }
+                updateSaveButtonState();
+            }
+        });
+    }
+
+    private void setupThoughtsValidation() {
+        thoughtsArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                validateThoughts();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                validateThoughts();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                validateThoughts();
+            }
+
+            private void validateThoughts() {
+                String thoughts = thoughtsArea.getText().trim();
+                if (thoughts.isEmpty()) {
+                    showThoughtsError("感想を入力してください");
+                } else if (thoughts.length() < 1 || thoughts.length() > 400) {
+                    showThoughtsError("感想は1〜400文字にしてください");
+                } else {
+                    clearThoughtsError();
+                }
+                updateSaveButtonState();
+            }
+        });
+    }
+
+    private void showTitleError(String message) {
+        titleErrorLabel.setText(message);
+        titleErrorLabel.setForeground(Color.RED);
+    }
+
+    private void clearTitleError() {
+        titleErrorLabel.setText("");
+    }
+
+    private void showAuthorError(String message) {
+        authorErrorLabel.setText(message);
+        authorErrorLabel.setForeground(Color.RED);
+    }
+
+    private void clearAuthorError() {
+        authorErrorLabel.setText("");
+    }
+
+    private void showThoughtsError(String message) {
+        thoughtsErrorLabel.setText(message);
+        thoughtsErrorLabel.setForeground(Color.RED);
+        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(Color.RED, 2));
+    }
+
+    private void clearThoughtsError() {
+        thoughtsErrorLabel.setText("");
+        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2));
+    }
+
+    private void updateSaveButtonState() {
+        boolean isTitleValid = isTitleValid();
+        boolean isAuthorValid = isAuthorValid();
+        boolean isThoughtsValid = isThoughtsValid();
+
+        saveButton.setEnabled(isTitleValid && isAuthorValid && isThoughtsValid);
+    }
+
+    private boolean isTitleValid() {
+        String title = titleField.getText().trim();
+        return title.length() >= 1 && title.length() <= 30;
+    }
+
+    private boolean isAuthorValid() {
+        String author = authorField.getText().trim();
+        return author.length() >= 1 && author.length() <= 15;
+    }
+
+    private boolean isThoughtsValid() {
+        String thoughts = thoughtsArea.getText().trim();
+        return thoughts.length() >= 1 && thoughts.length() <= 400;
+    }
+
+    private void setupSaveButton(String[] bookData) {
+        saveButton.setEnabled(false);
+        saveButton.addActionListener(e -> {
+            // 更新後の書籍情報を配列に格納
+            String[] updatedBookData = new String[6];
+            updatedBookData[0] = bookData[0];  // ID
+            updatedBookData[1] = bookData[1];  // 日付（変更なし）
+            updatedBookData[2] = titleField.getText().trim();
+            updatedBookData[3] = authorField.getText().trim();
+            updatedBookData[4] = String.valueOf(selectedReview);  // 星評価を保存
+            updatedBookData[5] = thoughtsArea.getText().trim();
+
+            CSVUtility.updateBookInCSV(updatedBookData);
+            JOptionPane.showMessageDialog(null, "変更が保存されました！");
+            dispose();
+            new ShowBookRecord(updatedBookData[0]).setVisible(true);
+        });
+    }
+
+    private void confirmAndDeleteBook(String bookId) {
+        int confirm = JOptionPane.showConfirmDialog(null, 
+            "本当に削除してよろしいですか？", 
+            "削除確認", 
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            CSVUtility.deleteBookFromCSV(bookId);
+            JOptionPane.showMessageDialog(null, "データが削除されました!");
+            dispose();
+            new BookRecords().setVisible(true);
+        }
+    }
+
+    private void updateStars(int review) {
         for (int i = 0; i < 5; i++) {
             if (i < review) {
                 stars[i].setText("★");

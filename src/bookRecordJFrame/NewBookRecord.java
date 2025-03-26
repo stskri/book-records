@@ -4,16 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -31,6 +28,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvException;
 
 public class NewBookRecord extends JFrame {
 
@@ -367,56 +367,50 @@ public class NewBookRecord extends JFrame {
     }
 
     private void saveBookRecord(String title, String author, int review, String reviewText) {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("book_records.csv", true), "UTF-8"))) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("book_records.csv"), "UTF-8"));
-            String lastLine = null;
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lastLine = line;
-            }
-            reader.close();
-
-            int nextId = 1;
-            if (lastLine != null) {
-                String[] lastRecord = lastLine.split(",");
-                nextId = Integer.parseInt(lastRecord[0].trim()) + 1;
-            }
-
+        try {
+            // 次のIDを取得
+            int nextId = getNextId();
             String id = String.format("%08d", nextId);
 
+            // 現在時刻の取得
             LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Tokyo"));
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String formattedTime = currentTime.format(formatter);
 
-            String escapedTitle = escapeCSV(title);
-            String escapedAuthor = escapeCSV(author);
-            String escapedReviewText = escapeCSV(reviewText);
-
-            writer.write(String.format("%s,%s,%s,%s,%d,%s%n", 
+            // CSVに書き込む文字列配列を準備
+            String[] record = {
                 id, 
                 formattedTime, 
-                escapedTitle, 
-                escapedAuthor, 
-                review, 
-                escapedReviewText
-            ));
+                title, 
+                author, 
+                String.valueOf(review), 
+                reviewText
+            };
+
+            // CSVにレコードを追加
+            try (CSVWriter writer = new CSVWriter(new FileWriter("book_records.csv", true))) {
+                writer.writeNext(record);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private String escapeCSV(String input) {
-        if (input == null) {
-            return "";
+    private int getNextId() {
+        try (CSVReader reader = new CSVReader(new FileReader("book_records.csv"))) {
+            List<String[]> records = reader.readAll();
+            
+            // ファイルが空の場合は1を返す
+            if (records.isEmpty()) {
+                return 1;
+            }
+            
+            // 最後のレコードのIDを取得して+1
+            String[] lastRecord = records.get(records.size() - 1);
+            return Integer.parseInt(lastRecord[0]) + 1;
+        } catch (IOException | CsvException e) {
+            // ファイルが存在しない、または読み取れない場合は1を返す
+            return 1;
         }
-
-        input = input.replace("\"", "\"\"");
-        input = input.replace("\n", "\\n").replace("\r", "\\r");
-
-        if (input.contains(",") || input.contains("\"") || input.contains("\\n") || input.contains("\\r")) {
-            input = "\"" + input + "\"";
-        }
-
-        return input;
     }
 }

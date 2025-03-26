@@ -233,6 +233,10 @@ public class BookRecords extends JFrame {
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
                 if (data.length == 6) {
+                    // 各要素をアンエスケープ
+                    for (int i = 0; i < data.length; i++) {
+                        data[i] = unescapeCSV(data[i]);
+                    }
                     bookItems.add(data);
                 }
             }
@@ -246,6 +250,22 @@ public class BookRecords extends JFrame {
         // フィルタリング用にfilteredBookItemsをセット
         filteredBookItems.clear();
         filteredBookItems.addAll(bookItems);
+    }
+
+    private String unescapeCSV(String input) {
+        if (input == null) {
+            return "";
+        }
+        // 前後のダブルクォーテーションを削除
+        if (input.startsWith("\"") && input.endsWith("\"")) {
+            input = input.substring(1, input.length() - 1);
+        }
+        // エスケープされた改行文字を実際の改行文字に戻す
+        input = input.replace("\\r\\n", "\r\n")
+                     .replace("\\n", "\n")
+                     .replace("\\r", "\r")
+                     .replace("\"\"", "\"");
+        return input;
     }
 
     private void showPage(int page) {

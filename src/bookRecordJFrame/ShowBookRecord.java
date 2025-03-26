@@ -183,7 +183,7 @@ public class ShowBookRecord extends JFrame {
         editButton.setPreferredSize(new Dimension(150, 30)); // 固定サイズ設定
         editButton.addActionListener((ActionEvent e) -> {
             dispose();
-            new EditBookRecord(bookData).setVisible(true);
+            new EditBookRecord(bookData[0]).setVisible(true);
         });
         
         // 戻るボタン

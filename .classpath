@@ -7,5 +7,7 @@
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/flatlaf-3.5.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/GE-L0457/Downloads/opencsv-5.10.jar"/>
+	<classpathentry kind="lib" path="C:/Users/GE-L0457/Downloads/commons-lang3-3.17.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

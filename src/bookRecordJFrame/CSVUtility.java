@@ -1,34 +1,25 @@
 package bookRecordJFrame;
 
-import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CSVUtility {
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvException;
 
-    private static final String FILE_PATH = "book_records.csv";  // CSVファイルのパスをbook_records.csvに設定
+public class CSVUtility {
+    private static final String FILE_PATH = "book_records.csv";
 
     // CSVファイルを読み込んで、書籍データをリストで返す
     public static List<String[]> readBooksFromCSV() {
         List<String[]> books = new ArrayList<>();
-        try {
-            // ファイルが存在するか確認し、ない場合は新しく作成する
-            Path path = Paths.get(FILE_PATH);
-            if (!Files.exists(path)) {
-                Files.createFile(path);
-            }
-
-            // ファイルを読み込み
-            List<String> lines = Files.readAllLines(path);
-            for (String line : lines) {
-                books.add(line.split(","));
-            }
-        } catch (IOException e) {
+        try (CSVReader reader = new CSVReader(new FileReader(FILE_PATH))) {
+            books = reader.readAll();
+        } catch (IOException | CsvException e) {
+            // ファイルが存在しない、または読み取れない場合は空のリストを返す
             e.printStackTrace();
         }
         return books;
@@ -36,11 +27,8 @@ public class CSVUtility {
 
     // 書籍データをCSVファイルに書き込む
     public static void writeBooksToCSV(List<String[]> books) {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(FILE_PATH), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
-            for (String[] book : books) {
-                writer.write(String.join(",", book));  // 配列の各要素をカンマ区切りで書き込み
-                writer.newLine();  // 行を改行
-            }
+        try (CSVWriter writer = new CSVWriter(new FileWriter(FILE_PATH))) {
+            writer.writeAll(books);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,7 +38,7 @@ public class CSVUtility {
     public static void updateBookInCSV(String[] updatedBookData) {
         List<String[]> books = readBooksFromCSV();
         boolean bookUpdated = false;
-
+        
         // 書籍データを更新
         for (int i = 0; i < books.size(); i++) {
             String[] book = books.get(i);
@@ -60,10 +48,10 @@ public class CSVUtility {
                 break;
             }
         }
-
+        
         // 書籍データが更新された場合のみ書き込む
         if (bookUpdated) {
-            writeBooksToCSV(books);  // 更新されたデータをCSVに書き込む
+            writeBooksToCSV(books);
         }
     }
 
@@ -71,7 +59,7 @@ public class CSVUtility {
     public static void deleteBookFromCSV(String bookId) {
         List<String[]> books = readBooksFromCSV();
         boolean bookDeleted = false;
-
+        
         // 書籍データを削除
         for (int i = 0; i < books.size(); i++) {
             String[] book = books.get(i);
@@ -81,10 +69,10 @@ public class CSVUtility {
                 break;
             }
         }
-
+        
         // 書籍データが削除された場合のみ書き込む
         if (bookDeleted) {
-            writeBooksToCSV(books);  // 削除後のデータをCSVに書き込む
+            writeBooksToCSV(books);
         }
     }
 }
