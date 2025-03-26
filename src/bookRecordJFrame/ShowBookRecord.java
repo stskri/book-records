@@ -9,11 +9,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +27,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.formdev.flatlaf.FlatLightLaf;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 
 public class ShowBookRecord extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -217,64 +217,19 @@ public class ShowBookRecord extends JFrame {
     }
 
     private String[] loadBookDataById(String bookId) {
-        try (BufferedReader br = new BufferedReader(new FileReader("book_records.csv"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                List<String> data = parseCSV(line);
-                if (data.size() == 6 && data.get(0).equals(bookId)) {
-                    // 配列に変換して返す
-                    return data.toArray(new String[0]);
+        try (CSVReader reader = new CSVReader(new FileReader("book_records.csv"))) {
+            List<String[]> allRecords = reader.readAll();
+            for (String[] record : allRecords) {
+                if (record.length == 6 && record[0].equals(bookId)) {
+                    return record;
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    // 以前作成したCSVパース用のメソッド群
-    private List<String> parseCSV(String line) {
-        List<String> fields = new ArrayList<>();
-        StringBuilder currentField = new StringBuilder();
-        boolean inQuotes = false;
-        
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-            
-            if (c == '"') {
-                // 連続するダブルクォーテーションをチェック
-                if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
-                    // エスケープされたダブルクォーテーション
-                    currentField.append('"');
-                    i++; // 次の文字をスキップ
-                } else {
-                    // 引用の開始または終了
-                    inQuotes = !inQuotes;
-                }
-            } else if (c == ',' && !inQuotes) {
-                // 引用符の外のカンマ = フィールドの区切り
-                fields.add(unescapeCSV(currentField.toString()));
-                currentField = new StringBuilder();
-            } else {
-                // 通常の文字
-                currentField.append(c);
-            }
-        }
-        
-        // 最後のフィールドを追加
-        fields.add(unescapeCSV(currentField.toString()));
-        
-        return fields;
-    }
-
-    private String unescapeCSV(String input) {
-        if (input == null) {
-            return "";
-        }
-
-        // エスケープされた改行を元に戻す
-        return input.replace("\\n", "\n").replace("\\r", "\r");
-    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

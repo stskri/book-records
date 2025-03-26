@@ -38,17 +38,17 @@ public class CSVUtility {
     public static void updateBookInCSV(String[] updatedBookData) {
         List<String[]> books = readBooksFromCSV();
         boolean bookUpdated = false;
-        
+
         // 書籍データを更新
         for (int i = 0; i < books.size(); i++) {
             String[] book = books.get(i);
-            if (book[0].equals(updatedBookData[0])) {  // IDで一致する書籍を見つけて更新
+            if (book[0].equals(updatedBookData[0])) {
                 books.set(i, updatedBookData);
                 bookUpdated = true;
                 break;
             }
         }
-        
+
         // 書籍データが更新された場合のみ書き込む
         if (bookUpdated) {
             writeBooksToCSV(books);

@@ -2,7 +2,6 @@ package bookRecordJFrame;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -22,6 +21,9 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+
 public class EditBookRecord extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -36,7 +38,30 @@ public class EditBookRecord extends JFrame {
     private JLabel thoughtsErrorLabel;
     private JScrollPane thoughtsScrollPane;
 
+    // コンストラクタ（文字列配列を受け取る）
     public EditBookRecord(String[] bookData) {
+        initializeFrame();
+        setupComponents(bookData);
+    }
+
+    // 新しいコンストラクタ（IDのみを受け取る）
+    public EditBookRecord(String bookId) {
+        // CSVからbookIdに対応するデータを読み込む
+        String[] bookData = loadBookDataById(bookId);
+        
+        if (bookData == null) {
+            // データが見つからない場合のエラーハンドリング
+            JOptionPane.showMessageDialog(null, "書籍データが見つかりませんでした。", "エラー", JOptionPane.ERROR_MESSAGE);
+            dispose();
+            return;
+        }
+
+        initializeFrame();
+        setupComponents(bookData);
+    }
+
+    // フレームの初期設定
+    private void initializeFrame() {
         setTitle("書籍情報編集");
         setBounds(100, 100, 900, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -46,7 +71,10 @@ public class EditBookRecord extends JFrame {
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
+    }
 
+    // コンポーネントのセットアップ
+    private void setupComponents(String[] bookData) {
         JPanel panel = new JPanel();
         panel.setLayout(null);
         panel.setBackground(new Color(255, 255, 255));
@@ -139,78 +167,24 @@ public class EditBookRecord extends JFrame {
         setupValidation();
         setupSaveButton(bookData);
     }
+
+    // CSVからデータを読み込むメソッド
+    private String[] loadBookDataById(String bookId) {
+        try (CSVReader csvReader = new CSVReader(new FileReader("book_records.csv"))) {
+            String[] nextRecord;
+            while ((nextRecord = csvReader.readNext()) != null) {
+                // bookIdが一致するデータを探す
+                if (nextRecord[0].equals(bookId)) {
+                    return nextRecord;
+                }
+            }
+        } catch (IOException | CsvException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
-
- // 新たにIDのみを受け取るコンストラクターを追加
- public EditBookRecord(String bookId) {
-     // 1. CSVからbookIdに対応するデータを読み込む
-     String[] bookData = loadBookDataById(bookId);
-     
-     if (bookData == null) {
-         // データが見つからない場合のエラーハンドリング
-         JOptionPane.showMessageDialog(null, "書籍データが見つかりませんでした。", "エラー", JOptionPane.ERROR_MESSAGE);
-         dispose();
-         return;
-     }
-
-     // 2. 既存のコンストラクターの処理を呼び出す
-     initializeComponents(bookData);
- }
-
- // コンポーネントの初期化メソッドを追加
- private void initializeComponents(String[] bookData) {
-     // 既存のコンストラクター内の処理をここに移動
-     setTitle("書籍情報編集");
-     setBounds(100, 100, 900, 500);
-     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-     try {
-         UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatLightLaf());
-     } catch (UnsupportedLookAndFeelException e) {
-         e.printStackTrace();
-     }
-
-     // 以下、既存のコンストラクター内の処理をそのまま記述
-     // ...（既存のコードをここにコピー）
- }
-
- // CSVからデータを読み込むメソッドを追加
- private String[] loadBookDataById(String bookId) {
-     try (BufferedReader br = new BufferedReader(new FileReader("book_records.csv"))) {
-         String line;
-         while ((line = br.readLine()) != null) {
-             String[] data = line.split(",");
-             if (data.length == 6 && data[0].equals(bookId)) {
-                 // 各要素をアンエスケープ
-                 for (int i = 0; i < data.length; i++) {
-                     data[i] = unescapeCSV(data[i]);
-                 }
-                 return data;
-             }
-         }
-     } catch (IOException e) {
-         e.printStackTrace();
-     }
-     return null;
- }
-
- // CSVのアンエスケープメソッドを追加（既存のコードと同様）
- private String unescapeCSV(String input) {
-     if (input == null) {
-         return "";
-     }
-     // 前後のダブルクォーテーションを削除
-     if (input.startsWith("\"") && input.endsWith("\"")) {
-         input = input.substring(1, input.length() - 1);
-     }
-     // エスケープされた改行文字を実際の改行文字に戻す
-     input = input.replace("\\r\\n", "\r\n")
-                  .replace("\\n", "\n")
-                  .replace("\\r", "\r")
-                  .replace("\"\"", "\"");
-     return input;
- }
-
+    // テキストフィールドのセットアップ
     private void setupTextField(JPanel panel, JTextField textField) {
         Border border = BorderFactory.createLineBorder(new Color(230, 230, 230), 2);
         Border margin = BorderFactory.createEmptyBorder(0, 10, 0, 10);
@@ -218,6 +192,7 @@ public class EditBookRecord extends JFrame {
         panel.add(textField);
     }
 
+    // 星評価のセットアップ
     private void setupStarRating(JPanel panel, String[] bookData) {
         JLabel reviewLabel = new JLabel("レビュー:");
         reviewLabel.setBounds(20, 170, 150, 30);
@@ -256,12 +231,29 @@ public class EditBookRecord extends JFrame {
         }
     }
 
+    // 書籍削除の確認
+    private void confirmAndDeleteBook(String bookId) {
+        int confirm = JOptionPane.showConfirmDialog(null, 
+            "本当に削除してよろしいですか？", 
+            "削除確認", 
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            CSVUtility.deleteBookFromCSV(bookId);
+            JOptionPane.showMessageDialog(null, "データが削除されました!");
+            dispose();
+            new BookRecords().setVisible(true);
+        }
+    }
+
+    // バリデーションのセットアップ
     private void setupValidation() {
         setupTitleValidation();
         setupAuthorValidation();
         setupThoughtsValidation();
     }
 
+    // タイトルバリデーション
     private void setupTitleValidation() {
         titleField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -293,6 +285,7 @@ public class EditBookRecord extends JFrame {
         });
     }
 
+    // 著者バリデーション
     private void setupAuthorValidation() {
         authorField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -324,6 +317,7 @@ public class EditBookRecord extends JFrame {
         });
     }
 
+    // 感想バリデーション
     private void setupThoughtsValidation() {
         thoughtsArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -355,58 +349,7 @@ public class EditBookRecord extends JFrame {
         });
     }
 
-    private void showTitleError(String message) {
-        titleErrorLabel.setText(message);
-        titleErrorLabel.setForeground(Color.RED);
-    }
-
-    private void clearTitleError() {
-        titleErrorLabel.setText("");
-    }
-
-    private void showAuthorError(String message) {
-        authorErrorLabel.setText(message);
-        authorErrorLabel.setForeground(Color.RED);
-    }
-
-    private void clearAuthorError() {
-        authorErrorLabel.setText("");
-    }
-
-    private void showThoughtsError(String message) {
-        thoughtsErrorLabel.setText(message);
-        thoughtsErrorLabel.setForeground(Color.RED);
-        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(Color.RED, 2));
-    }
-
-    private void clearThoughtsError() {
-        thoughtsErrorLabel.setText("");
-        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2));
-    }
-
-    private void updateSaveButtonState() {
-        boolean isTitleValid = isTitleValid();
-        boolean isAuthorValid = isAuthorValid();
-        boolean isThoughtsValid = isThoughtsValid();
-
-        saveButton.setEnabled(isTitleValid && isAuthorValid && isThoughtsValid);
-    }
-
-    private boolean isTitleValid() {
-        String title = titleField.getText().trim();
-        return title.length() >= 1 && title.length() <= 30;
-    }
-
-    private boolean isAuthorValid() {
-        String author = authorField.getText().trim();
-        return author.length() >= 1 && author.length() <= 15;
-    }
-
-    private boolean isThoughtsValid() {
-        String thoughts = thoughtsArea.getText().trim();
-        return thoughts.length() >= 1 && thoughts.length() <= 400;
-    }
-
+    // 保存ボタンのセットアップ
     private void setupSaveButton(String[] bookData) {
         saveButton.setEnabled(false);
         saveButton.addActionListener(e -> {
@@ -426,20 +369,7 @@ public class EditBookRecord extends JFrame {
         });
     }
 
-    private void confirmAndDeleteBook(String bookId) {
-        int confirm = JOptionPane.showConfirmDialog(null, 
-            "本当に削除してよろしいですか？", 
-            "削除確認", 
-            JOptionPane.YES_NO_OPTION);
-        
-        if (confirm == JOptionPane.YES_OPTION) {
-            CSVUtility.deleteBookFromCSV(bookId);
-            JOptionPane.showMessageDialog(null, "データが削除されました!");
-            dispose();
-            new BookRecords().setVisible(true);
-        }
-    }
-
+    // スター表示の更新
     private void updateStars(int review) {
         for (int i = 0; i < 5; i++) {
             if (i < review) {
@@ -450,6 +380,68 @@ public class EditBookRecord extends JFrame {
                 stars[i].setForeground(Color.GRAY);
             }
         }
+    }
+
+    // タイトルエラーメッセージの表示
+    private void showTitleError(String message) {
+        titleErrorLabel.setText(message);
+        titleErrorLabel.setForeground(Color.RED);
+    }
+
+    // タイトルエラーのクリア
+    private void clearTitleError() {
+        titleErrorLabel.setText("");
+    }
+
+    // 著者エラーメッセージの表示
+    private void showAuthorError(String message) {
+        authorErrorLabel.setText(message);
+        authorErrorLabel.setForeground(Color.RED);
+    }
+
+    // 著者エラーのクリア
+    private void clearAuthorError() {
+        authorErrorLabel.setText("");
+    }
+
+    // 感想エラーメッセージの表示
+    private void showThoughtsError(String message) {
+        thoughtsErrorLabel.setText(message);
+        thoughtsErrorLabel.setForeground(Color.RED);
+        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(Color.RED, 2));
+    }
+
+    // 感想エラーのクリア
+    private void clearThoughtsError() {
+        thoughtsErrorLabel.setText("");
+        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2));
+    }
+
+    // 保存ボタンの状態更新
+    private void updateSaveButtonState() {
+        boolean isTitleValid = isTitleValid();
+        boolean isAuthorValid = isAuthorValid();
+        boolean isThoughtsValid = isThoughtsValid();
+
+        saveButton.setEnabled(isTitleValid && isAuthorValid && isThoughtsValid);
+    }
+
+    // タイトルの有効性チェック
+    private boolean isTitleValid() {
+        String title = titleField.getText().trim();
+        return title.length() >= 1 && title.length() <= 30;
+    }
+
+    // 著者の有効性チェック
+    private boolean isAuthorValid() {
+        String author = authorField.getText().trim();
+        return author.length() >= 1 && author.length() <= 15;
+    }
+
+    // 感想の有効性チェック
+    private boolean isThoughtsValid() {
+        String thoughts = thoughtsArea.getText().trim();
+        return thoughts.length() >= 1 && thoughts.length() <= 400;
     }
 
     public static void main(String[] args) {
