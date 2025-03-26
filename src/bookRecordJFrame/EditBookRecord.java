@@ -171,7 +171,7 @@ public class EditBookRecord extends JFrame {
                 updatedBookData[5] = thoughtsArea.getText();
 
                 CSVUtility.updateBookInCSV(updatedBookData);
-                JOptionPane.showMessageDialog(null, "変更が保存されました!");
+                JOptionPane.showMessageDialog(null, "変更が保存されました！");
                 dispose();
                 new ShowBookRecord(updatedBookData[0]).setVisible(true);
             }
@@ -207,7 +207,7 @@ public class EditBookRecord extends JFrame {
                 if (confirm == JOptionPane.YES_OPTION) {
                     // CSVから削除
                     CSVUtility.deleteBookFromCSV(bookData[0]);
-                    JOptionPane.showMessageDialog(null, "書籍が削除されました!");
+                    JOptionPane.showMessageDialog(null, "データが削除されました!");
 
                     // 編集ウィンドウを閉じる
                     dispose();
