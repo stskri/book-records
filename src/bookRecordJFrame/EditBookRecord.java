@@ -21,6 +21,7 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
@@ -445,6 +446,13 @@ public class EditBookRecord extends JFrame {
     }
 
     public static void main(String[] args) {
+    	
+    	 try {
+             UIManager.setLookAndFeel(new FlatLightLaf());
+         } catch (UnsupportedLookAndFeelException e) {
+             e.printStackTrace();
+         }
+    	 
         String[] sampleData = {"1", "2025-03-24", "Java Programming", "John Doe", "4", "Great book for Java!"};
         SwingUtilities.invokeLater(() -> {
             EditBookRecord frame = new EditBookRecord(sampleData);

@@ -65,7 +65,7 @@ public class NewBookRecord extends JFrame {
 
     public NewBookRecord() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 900, 465);
+        setBounds(100, 100, 900, 550);
         contentPane = new JPanel();
         contentPane.setBackground(new Color(255, 255, 255));
         setContentPane(contentPane);
@@ -121,18 +121,18 @@ public class NewBookRecord extends JFrame {
         reviewTextArea.setWrapStyleWord(true);
 
         JScrollPane scrollPane = new JScrollPane(reviewTextArea);
-        scrollPane.setBounds(185, 235, 600, 100);
+        scrollPane.setBounds(185, 235, 600, 180);
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2));
         contentPane.add(scrollPane);
 
         reviewErrorLabel = new JLabel();
-        reviewErrorLabel.setBounds(185, 335, 600, 20);
+        reviewErrorLabel.setBounds(185, 415, 600, 20);
         reviewErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(reviewErrorLabel);
 
         // 保存ボタン
         saveButton = new JButton("Save Record");
-        saveButton.setBounds(375, 360, 150, 40);
+        saveButton.setBounds(350, 445, 200, 40);
         contentPane.add(saveButton);
 
         // バリデーションとイベントリスナーのセットアップ
