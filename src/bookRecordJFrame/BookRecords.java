@@ -187,17 +187,24 @@ public class BookRecords extends JFrame {
         JPanel paginationPanel = new JPanel();
 
         // 1. 全ページ数を計算
-        int totalPages = (int) Math.ceil((double) filteredBookItems.size() / PAGE_SIZE);
-        if (totalPages == 0) totalPages = 1; // 本がない場合でも最低1ページ
+        int totalPagesTemp = (int) Math.ceil((double) filteredBookItems.size() / PAGE_SIZE);
+        final int totalPages = totalPagesTemp == 0 ? 1 : totalPagesTemp; // 本がない場合でも最低1ページ
 
-        // 2. 前ページへボタン
-        JButton prevButton = new JButton("<<");
+        // 2. 最初のページへボタン
+        JButton firstButton = new JButton("|<<");
+        firstButton.addActionListener(e -> showPage(0));
+        firstButton.setEnabled(currentPage > 0);
+        firstButton.setPreferredSize(new Dimension(50, 30)); // 固定サイズ設定
+        paginationPanel.add(firstButton);
+
+        // 3. 前ページへボタン
+        JButton prevButton = new JButton("<");
         prevButton.addActionListener(e -> showPage(currentPage - 1));
         prevButton.setEnabled(currentPage > 0);
         prevButton.setPreferredSize(new Dimension(50, 30)); // 固定サイズ設定
         paginationPanel.add(prevButton);
 
-        // 3. ページ番号ボタンを表示（Google風に）
+        // 4. ページ番号ボタンを表示（Google風に）
         int displayPages = 7;
         int startPage = Math.max(0, Math.min(currentPage - displayPages / 2, totalPages - displayPages));
         int endPage = Math.min(startPage + displayPages, totalPages);
@@ -218,12 +225,19 @@ public class BookRecords extends JFrame {
             paginationPanel.add(pageButton);
         }
 
-        // 4. 次ページへボタン
-        JButton nextButton = new JButton(">>");
+        // 5. 次ページへボタン
+        JButton nextButton = new JButton(">");
         nextButton.addActionListener(e -> showPage(currentPage + 1));
         nextButton.setEnabled(currentPage < totalPages - 1);
         nextButton.setPreferredSize(new Dimension(50, 30));
         paginationPanel.add(nextButton);
+
+        // 6. 最後のページへボタン
+        JButton lastButton = new JButton(">>|");
+        lastButton.addActionListener(e -> showPage(totalPages - 1));
+        lastButton.setEnabled(currentPage < totalPages - 1);
+        lastButton.setPreferredSize(new Dimension(50, 30));
+        paginationPanel.add(lastButton);
 
         return paginationPanel;
     }
