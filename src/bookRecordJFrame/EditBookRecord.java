@@ -111,7 +111,7 @@ public class EditBookRecord extends JFrame {
         deleteButton.setBounds(760, 25, 100, 40);
         deleteButton.setForeground(Color.red);
         deleteButton.setBackground(Color.WHITE);  // 背景色を明示的にwhiteに設定
-        deleteButton.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+        deleteButton.setBorder(BorderFactory.createLineBorder(Color.red, 2));
         deleteButton.setContentAreaFilled(true);  // ボタンの塗りつぶしを有効化
         deleteButton.addActionListener(e -> confirmAndDeleteBook(bookData[0]));
         contentPane.add(deleteButton);
@@ -442,7 +442,7 @@ public class EditBookRecord extends JFrame {
     // 感想エラーのクリア
     private void clearThoughtsError() {
         thoughtsErrorLabel.setText("");
-        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2));
+        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
     }
 
     // 保存ボタンの状態更新

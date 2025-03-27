@@ -87,6 +87,8 @@ public class ShowBookRecord extends JFrame {
         JLabel titleValueLabel = new JLabel(bookData[2]);
         titleValueLabel.setBounds(185, 90, 600, 30);
         titleValueLabel.setBorder(createTextFieldBorder());
+        titleValueLabel.setBackground(new Color(250, 250, 250));
+        titleValueLabel.setOpaque(true);
         contentPane.add(titleValueLabel);
 
         // 著者
@@ -97,6 +99,8 @@ public class ShowBookRecord extends JFrame {
         JLabel authorValueLabel = new JLabel(bookData[3]);
         authorValueLabel.setBounds(185, 140, 600, 30);
         authorValueLabel.setBorder(createTextFieldBorder());
+        authorValueLabel.setBackground(new Color(250, 250, 250));
+        authorValueLabel.setOpaque(true);
         contentPane.add(authorValueLabel);
 
         // 星評価のラベル
@@ -117,7 +121,7 @@ public class ShowBookRecord extends JFrame {
         thoughtsArea.setLineWrap(true);
         thoughtsArea.setWrapStyleWord(true);
         thoughtsArea.setEditable(false);
-        thoughtsArea.setBackground(Color.white);
+        thoughtsArea.setBackground(new Color(250, 250, 250));
       
         JScrollPane thoughtsScrollPane = new JScrollPane(thoughtsArea);
         thoughtsScrollPane.setBounds(185, 240, 600, 180);
