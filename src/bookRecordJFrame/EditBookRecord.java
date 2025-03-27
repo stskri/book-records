@@ -41,6 +41,9 @@ public class EditBookRecord extends JFrame {
     private JLabel authorErrorLabel;
     private JLabel thoughtsErrorLabel;
     private JScrollPane thoughtsScrollPane;
+    private JLabel titleCharCountLabel;
+    private JLabel authorCharCountLabel;
+    private JLabel thoughtsCharCountLabel;
     
     // コンストラクタ（文字列配列を受け取る）
     public EditBookRecord(String[] bookData) {
@@ -175,6 +178,24 @@ public class EditBookRecord extends JFrame {
         thoughtsErrorLabel.setBounds(185, 420, 600, 20);  // Y座標を調整
         thoughtsErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(thoughtsErrorLabel);
+        
+        // タイトル文字数カウントラベルの追加
+        titleCharCountLabel = new JLabel("0/30", SwingConstants.RIGHT);
+        titleCharCountLabel.setBounds(735, 120, 50, 20);
+        titleCharCountLabel.setForeground(Color.GRAY);
+        contentPane.add(titleCharCountLabel);
+
+        // 作者文字数カウントラベルの追加
+        authorCharCountLabel = new JLabel("0/15", SwingConstants.RIGHT);
+        authorCharCountLabel.setBounds(735, 170, 50, 20);
+        authorCharCountLabel.setForeground(Color.GRAY);
+        contentPane.add(authorCharCountLabel);
+
+        // 感想文字数カウントラベルの追加
+        thoughtsCharCountLabel = new JLabel("0/400", SwingConstants.RIGHT);
+        thoughtsCharCountLabel.setBounds(735, 420, 50, 20);
+        thoughtsCharCountLabel.setForeground(Color.GRAY);
+        contentPane.add(thoughtsCharCountLabel);
 
         // 保存ボタン
         saveButton = new JButton("変更を保存");
@@ -187,7 +208,13 @@ public class EditBookRecord extends JFrame {
         setupValidation();
         setupSaveButton(bookData);
         
+        setupCharacterCountDisplay();
         
+        SwingUtilities.invokeLater(() -> {
+            updateTitleCharCount();
+            updateAuthorCharCount();
+            updateThoughtsCharCount();
+        });
     }
 
     // CSVからデータを読み込むメソッド
@@ -451,6 +478,101 @@ public class EditBookRecord extends JFrame {
     private void clearThoughtsError() {
         thoughtsErrorLabel.setText("");
         thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
+    }
+    
+    private void setupCharacterCountDisplay() {
+        // タイトル文字数カウント
+        titleField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateTitleCharCount();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateTitleCharCount();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateTitleCharCount();
+            }
+        });
+
+        // 作者文字数カウント
+        authorField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateAuthorCharCount();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateAuthorCharCount();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateAuthorCharCount();
+            }
+        });
+
+        // 感想文字数カウント
+        thoughtsArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateThoughtsCharCount();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateThoughtsCharCount();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateThoughtsCharCount();
+            }
+        });
+    }
+    
+ // タイトルの文字数カウント更新メソッド
+    private void updateTitleCharCount() {
+        int currentLength = titleField.getText().trim().length();
+        titleCharCountLabel.setText(currentLength + "/30");
+        
+        // 文字数に応じて色を変更
+        if (currentLength > 30) {
+            titleCharCountLabel.setForeground(Color.RED);
+        } else {
+            titleCharCountLabel.setForeground(Color.GRAY);
+        }
+    }
+
+    // 作者の文字数カウント更新メソッド
+    private void updateAuthorCharCount() {
+        int currentLength = authorField.getText().trim().length();
+        authorCharCountLabel.setText(currentLength + "/15");
+        
+        // 文字数に応じて色を変更
+        if (currentLength > 15) {
+            authorCharCountLabel.setForeground(Color.RED);
+        } else {
+            authorCharCountLabel.setForeground(Color.GRAY);
+        }
+    }
+
+    // 感想の文字数カウント更新メソッド
+    private void updateThoughtsCharCount() {
+        int currentLength = thoughtsArea.getText().trim().length();
+        thoughtsCharCountLabel.setText(currentLength + "/400");
+        
+        // 文字数に応じて色を変更
+        if (currentLength > 400) {
+            thoughtsCharCountLabel.setForeground(Color.RED);
+        } else {
+            thoughtsCharCountLabel.setForeground(Color.GRAY);
+        }
     }
 
     // 保存ボタンの状態更新

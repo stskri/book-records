@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
@@ -46,6 +47,9 @@ public class NewBookRecord extends JFrame {
     private JLabel titleErrorLabel;
     private JLabel authorErrorLabel;
     private JLabel reviewErrorLabel;
+    private JLabel titleCharCountLabel;
+    private JLabel authorCharCountLabel;
+    private JLabel reviewCharCountLabel;
 
     public static void main(String[] args) {
         try {
@@ -137,6 +141,27 @@ public class NewBookRecord extends JFrame {
         // バリデーションとイベントリスナーのセットアップ
         setupValidation();
         setupSaveButton();
+        
+        // タイトル文字数カウントラベルの追加
+        titleCharCountLabel = new JLabel("0/30", SwingConstants.RIGHT);
+        titleCharCountLabel.setBounds(735, 115, 50, 20);
+        titleCharCountLabel.setForeground(Color.GRAY);
+        contentPane.add(titleCharCountLabel);
+
+        // 作者文字数カウントラベルの追加
+        authorCharCountLabel = new JLabel("0/15", SwingConstants.RIGHT);
+        authorCharCountLabel.setBounds(735, 165, 50, 20);
+        authorCharCountLabel.setForeground(Color.GRAY);
+        contentPane.add(authorCharCountLabel);
+
+        // 感想文字数カウントラベルの追加
+        reviewCharCountLabel = new JLabel("0/400", SwingConstants.RIGHT);
+        reviewCharCountLabel.setBounds(735, 415, 50, 20);
+        reviewCharCountLabel.setForeground(Color.GRAY);
+        contentPane.add(reviewCharCountLabel);
+
+        // 文字数カウントのセットアップ
+        setupCharacterCountDisplay();
     }
 
     private void setupBackButton(JButton backButton) {
@@ -285,6 +310,102 @@ public class NewBookRecord extends JFrame {
                 updateSaveButtonState();
             }
         });
+    }
+    
+    // 文字数カウント表示のセットアップ
+    private void setupCharacterCountDisplay() {
+        // タイトル文字数カウント
+        titleField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateTitleCharCount();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateTitleCharCount();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateTitleCharCount();
+            }
+        });
+
+        // 作者文字数カウント
+        authorField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateAuthorCharCount();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateAuthorCharCount();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateAuthorCharCount();
+            }
+        });
+
+        // 感想文字数カウント
+        reviewTextArea.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateReviewCharCount();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateReviewCharCount();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateReviewCharCount();
+            }
+        });
+    }
+
+    // タイトルの文字数カウント更新メソッド
+    private void updateTitleCharCount() {
+        int currentLength = titleField.getText().trim().length();
+        titleCharCountLabel.setText(currentLength + "/30");
+        
+        // 文字数に応じて色を変更
+        if (currentLength > 30) {
+            titleCharCountLabel.setForeground(Color.RED);
+        } else {
+            titleCharCountLabel.setForeground(Color.GRAY);
+        }
+    }
+
+    // 作者の文字数カウント更新メソッド
+    private void updateAuthorCharCount() {
+        int currentLength = authorField.getText().trim().length();
+        authorCharCountLabel.setText(currentLength + "/15");
+        
+        // 文字数に応じて色を変更
+        if (currentLength > 15) {
+            authorCharCountLabel.setForeground(Color.RED);
+        } else {
+            authorCharCountLabel.setForeground(Color.GRAY);
+        }
+    }
+
+    // 感想の文字数カウント更新メソッド
+    private void updateReviewCharCount() {
+        int currentLength = reviewTextArea.getText().trim().length();
+        reviewCharCountLabel.setText(currentLength + "/400");
+        
+        // 文字数に応じて色を変更
+        if (currentLength > 400) {
+            reviewCharCountLabel.setForeground(Color.RED);
+        } else {
+            reviewCharCountLabel.setForeground(Color.GRAY);
+        }
     }
 
     private void showTitleError(String message) {
