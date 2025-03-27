@@ -64,6 +64,7 @@ public class NewBookRecord extends JFrame {
     }
 
     public NewBookRecord() {
+    	setTitle("新規作成画面");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 900, 550);
         contentPane = new JPanel();
@@ -138,7 +139,7 @@ public class NewBookRecord extends JFrame {
     }
 
     private void setupBackButton(JButton backButton) {
-        backButton.setForeground(new Color(220, 220, 220));
+        backButton.setForeground(new Color(100, 220, 220));
         backButton.setPreferredSize(new Dimension(150, 40));
         backButton.setBackground(new Color(252, 252, 252));
         backButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));

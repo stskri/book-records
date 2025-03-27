@@ -52,6 +52,8 @@ public class EditBookRecord extends JFrame {
      * @wbp.parser.constructor
      */
     public EditBookRecord(String bookId) {
+    	setTitle("編集画面");
+    	
         // CSVからbookIdに対応するデータを読み込む
         String[] bookData = loadBookDataById(bookId);
         
@@ -85,7 +87,7 @@ public class EditBookRecord extends JFrame {
     private void setupComponents(String[] bookData) {
         // 戻るボタン（詳細画面に戻る）
         JButton backToListButton = new JButton("詳細画面に戻る");
-        backToListButton.setForeground(new Color(220, 220, 220));
+        backToListButton.setForeground(new Color(100, 220, 220));
         backToListButton.setBackground(new Color(252, 252, 252));
         backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
         backToListButton.addActionListener(e -> {
@@ -108,7 +110,7 @@ public class EditBookRecord extends JFrame {
         
         // 削除ボタン
         JButton deleteButton = new JButton("削除");
-        deleteButton.setBounds(760, 25, 100, 40);
+        deleteButton.setBounds(710, 25, 150, 40);
         deleteButton.setForeground(Color.red);
         deleteButton.setBackground(Color.WHITE);  // 背景色を明示的にwhiteに設定
         deleteButton.setBorder(BorderFactory.createLineBorder(Color.red, 2));

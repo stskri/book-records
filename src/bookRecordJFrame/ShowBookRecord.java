@@ -32,6 +32,8 @@ public class ShowBookRecord extends JFrame {
     private String[] bookData;
 
     public ShowBookRecord(String bookId) {
+    	setTitle("詳細画面");
+    	
         initializeFrame();
         
         // 本のデータをCSVから読み込む
@@ -58,7 +60,7 @@ public class ShowBookRecord extends JFrame {
     private void setupComponents() {
         // 戻るボタン（一覧画面に戻る）
         JButton backToListButton = new JButton("一覧画面に戻る");
-        backToListButton.setForeground(new Color(220, 220, 220));
+        backToListButton.setForeground(new Color(100, 220, 220));
         backToListButton.setBackground(new Color(252, 252, 252));
         backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
         backToListButton.addActionListener(e -> {

@@ -42,8 +42,8 @@ public class BookRecords extends JFrame {
     private JTextField searchField;
 
     public BookRecords() {
-        setTitle("Book Records");
-        setBounds(100, 100, 900, 572);
+        setTitle("一覧画面");
+        setBounds(100, 100, 900, 573);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         bookItems = new ArrayList<>();
@@ -115,6 +115,7 @@ public class BookRecords extends JFrame {
 
         // New Book Recordボタンを左寄せ
         JButton newBookButton = new JButton("新規作成");
+        newBookButton.setForeground(new Color(80, 230, 80));
         newBookButton.addActionListener(e -> openNewBookRecord());
         newBookButton.setBackground(Color.white);
 
