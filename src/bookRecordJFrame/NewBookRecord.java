@@ -160,7 +160,7 @@ public class NewBookRecord extends JFrame {
 
     private void setupStarRating() {
         for (int i = 0; i < 5; i++) {
-            stars[i] = new JLabel("★");
+            stars[i] = new JLabel("☆");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
             stars[i].setBounds(185 + (i * 40), 180, 40, 40);
             stars[i].setForeground(Color.GRAY);
@@ -363,16 +363,28 @@ public class NewBookRecord extends JFrame {
         });
     }
 
-    private void setReviewStars(int rating) {
-        for (int i = 0; i < 5; i++) {
-            stars[i].setForeground(i < rating ? Color.YELLOW : Color.GRAY);
+    private void setReviewStars(int count) {
+        selectedReview = count;
+        for (int i = 0; i < stars.length; i++) {
+            if (i < count) {
+                stars[i].setText("★");
+                stars[i].setForeground(Color.YELLOW);
+            } else {
+                stars[i].setText("☆");
+                stars[i].setForeground(Color.GRAY);
+            }
         }
-        selectedReview = rating;
     }
 
-    private void highlightStars(int rating) {
-        for (int i = 0; i < 5; i++) {
-            stars[i].setForeground(i < rating ? Color.YELLOW : Color.GRAY);
+    private void highlightStars(int count) {
+        for (int i = 0; i < stars.length; i++) {
+            if (i < count) {
+                stars[i].setText("★");
+                stars[i].setForeground(Color.YELLOW);
+            } else {
+                stars[i].setText("☆");
+                stars[i].setForeground(Color.GRAY);
+            }
         }
     }
 

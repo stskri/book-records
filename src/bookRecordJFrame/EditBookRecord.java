@@ -224,9 +224,9 @@ public class EditBookRecord extends JFrame {
         selectedReview = Integer.parseInt(bookData[4]); // 現在の評価を取得
 
         for (int i = 0; i < 5; i++) {
-            stars[i] = new JLabel("★");
+            stars[i] = new JLabel(i < selectedReview ? "★" : "☆");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
-            stars[i].setBounds(185 + (i * 40), 185, 40, 40);  // Y座標を190に変更
+            stars[i].setBounds(185 + (i * 40), 185, 40, 40); // Y座標を190に変更
             stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
             contentPane.add(stars[i]);
 
@@ -251,16 +251,21 @@ public class EditBookRecord extends JFrame {
         }
     }
 
-    
-
 
     // 書籍削除の確認
     private void confirmAndDeleteBook(String bookId) {
-        int confirm = JOptionPane.showConfirmDialog(null, 
+        Object[] options = {"はい", "いいえ"}; // ボタンのラベルを明示的に設定
+        int confirm = JOptionPane.showOptionDialog(
+            null, 
             "本当に削除してよろしいですか？", 
             "削除確認", 
-            JOptionPane.YES_NO_OPTION);
-        
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.QUESTION_MESSAGE, 
+            null, 
+            options, 
+            options[1] // デフォルト選択
+        );
+
         if (confirm == JOptionPane.YES_OPTION) {
             CSVUtility.deleteBookFromCSV(bookId);
             JOptionPane.showMessageDialog(null, "データが削除されました!");
@@ -406,7 +411,7 @@ public class EditBookRecord extends JFrame {
                 stars[i].setText("★");
                 stars[i].setForeground(Color.YELLOW);
             } else {
-                stars[i].setText("★");
+                stars[i].setText("☆");
                 stars[i].setForeground(Color.GRAY);
             }
         }
