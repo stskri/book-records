@@ -43,7 +43,7 @@ public class BookRecords extends JFrame {
 
     public BookRecords() {
         setTitle("Book Records");
-        setBounds(100, 100, 900, 575);
+        setBounds(100, 100, 900, 572);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         bookItems = new ArrayList<>();

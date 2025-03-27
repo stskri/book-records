@@ -61,9 +61,14 @@ public class EditBookRecord extends JFrame {
             dispose();
             return;
         }
-
+        
         initializeFrame();
         setupComponents(bookData);
+        
+        // 初期状態で全ての入力が有効であることを確認
+        SwingUtilities.invokeLater(() -> {
+            updateSaveButtonState();
+        });
     }
 
     // フレームの初期設定
@@ -90,7 +95,7 @@ public class EditBookRecord extends JFrame {
         backToListButton.setBounds(30, 25, 150, 40);
         contentPane.add(backToListButton);
 
-        // IDと登録日表示（右寄せ）
+        // IDと登録日表示
         JLabel idLabel = new JLabel("ID: " + bookData[0]);
         idLabel.setBounds(190, 30, 120, 30);
         idLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -100,7 +105,17 @@ public class EditBookRecord extends JFrame {
         dateLabel.setBounds(320, 30, 200, 30);
         dateLabel.setHorizontalAlignment(SwingConstants.LEFT);
         contentPane.add(dateLabel);
-
+        
+        // 削除ボタン
+        JButton deleteButton = new JButton("削除");
+        deleteButton.setBounds(760, 25, 100, 40);
+        deleteButton.setForeground(Color.red);
+        deleteButton.setBackground(Color.WHITE);  // 背景色を明示的にwhiteに設定
+        deleteButton.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+        deleteButton.setContentAreaFilled(true);  // ボタンの塗りつぶしを有効化
+        deleteButton.addActionListener(e -> confirmAndDeleteBook(bookData[0]));
+        contentPane.add(deleteButton);
+        
         // タイトル入力フィールド
         JLabel titleLabel = new JLabel("Book Title:");
         titleLabel.setBounds(100, 90, 75, 30);  // Y座標を90に変更
@@ -131,7 +146,7 @@ public class EditBookRecord extends JFrame {
 
         // 星評価のラベル
         JLabel reviewLabel = new JLabel("Review:");
-        reviewLabel.setBounds(100, 190, 75, 30);  // Y座標を190に変更
+        reviewLabel.setBounds(100, 190, 75, 30);
         contentPane.add(reviewLabel);
 
         // 星アイコンを配置
@@ -164,14 +179,6 @@ public class EditBookRecord extends JFrame {
         saveButton.setBackground(new Color(50, 205, 50));  // Green color like NewBookRecord
         saveButton.setForeground(Color.WHITE);
         contentPane.add(saveButton);
-
-        // 削除ボタン
-        JButton deleteButton = new JButton("書籍を削除");
-        deleteButton.setBounds(710, 25, 150, 40);
-        deleteButton.setForeground(Color.red);
-        deleteButton.setBorder(BorderFactory.createLineBorder(Color.red, 1));
-        deleteButton.addActionListener(e -> confirmAndDeleteBook(bookData[0]));
-        contentPane.add(deleteButton);
 
         // バリデーションとイベントリスナーのセットアップ
         setupValidation();
@@ -210,8 +217,6 @@ public class EditBookRecord extends JFrame {
         textField.setBorder(BorderFactory.createCompoundBorder(border, margin));
         contentPane.add(textField);
     }
-
-
     
     private void setupStarRating(String[] bookData) {
         selectedReview = Integer.parseInt(bookData[4]); // 現在の評価を取得
@@ -219,16 +224,33 @@ public class EditBookRecord extends JFrame {
         for (int i = 0; i < 5; i++) {
             stars[i] = new JLabel("★");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
-            stars[i].setBounds(185 + (i * 40), 190, 40, 40);  // Y座標を190に変更
+            stars[i].setBounds(185 + (i * 40), 185, 40, 40);  // Y座標を190に変更
             stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
             contentPane.add(stars[i]);
 
             final int index = i + 1;
             stars[i].addMouseListener(new java.awt.event.MouseAdapter() {
-                // (既存のマウスリスナーコード)
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    selectedReview = index;
+                    updateStars(selectedReview);
+                }
+
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    updateStars(index);
+                }
+
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    updateStars(selectedReview);
+                }
             });
         }
     }
+
+    
+
 
     // 書籍削除の確認
     private void confirmAndDeleteBook(String bookId) {
@@ -350,7 +372,14 @@ public class EditBookRecord extends JFrame {
 
     // 保存ボタンのセットアップ
     private void setupSaveButton(String[] bookData) {
-        saveButton.setEnabled(false);
+        // 初期状態で保存ボタンを有効にする
+        saveButton.setEnabled(true);
+        
+        // スタイルも初期状態で有効な見た目に設定
+        saveButton.setForeground(new Color(0, 180, 0)); // 濃い緑色のテキスト
+        saveButton.setBackground(new Color(255, 255, 255));
+        saveButton.setBorder(BorderFactory.createLineBorder(new Color(0, 180, 0), 2)); // 濃い緑色のボーダー
+
         saveButton.addActionListener(e -> {
             // 更新後の書籍情報を配列に格納
             String[] updatedBookData = new String[6];
@@ -375,7 +404,7 @@ public class EditBookRecord extends JFrame {
                 stars[i].setText("★");
                 stars[i].setForeground(Color.YELLOW);
             } else {
-                stars[i].setText("☆");
+                stars[i].setText("★");
                 stars[i].setForeground(Color.GRAY);
             }
         }
