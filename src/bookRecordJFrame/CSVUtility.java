@@ -1,9 +1,10 @@
 package bookRecordJFrame;
 
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +15,11 @@ import com.opencsv.exceptions.CsvException;
 public class CSVUtility {
     private static final String FILE_PATH = "book_records.csv";
 
-    // CSVファイルを読み込んで、書籍データをリストで返す
+    // CSVファイルを読み込んで、書籍データをリストで返す（Shift_JIS対応）
     public static List<String[]> readBooksFromCSV() {
         List<String[]> books = new ArrayList<>();
-        try (CSVReader reader = new CSVReader(new FileReader(FILE_PATH))) {
+        try (CSVReader reader = new CSVReader(
+                new InputStreamReader(new FileInputStream(FILE_PATH), "Shift_JIS"))) {
             books = reader.readAll();
         } catch (IOException | CsvException e) {
             // ファイルが存在しない、または読み取れない場合は空のリストを返す
@@ -26,14 +28,14 @@ public class CSVUtility {
         return books;
     }
 
-    // 書籍データをCSVファイルに書き込む
+    // 書籍データをCSVファイルに書き込む（Shift_JIS対応）
     public static void writeBooksToCSV(List<String[]> books) {
         try (CSVWriter writer = new CSVWriter(
-                new FileWriter(FILE_PATH, StandardCharsets.UTF_8),  // Specify UTF-8 encoding
-                CSVWriter.DEFAULT_SEPARATOR,        // Use default comma separator
-                CSVWriter.DEFAULT_QUOTE_CHARACTER,  // Use default quote character
-                CSVWriter.DEFAULT_ESCAPE_CHARACTER, // Use default escape character
-                CSVWriter.DEFAULT_LINE_END         // Use default line ending
+                new OutputStreamWriter(new FileOutputStream(FILE_PATH), "Shift_JIS"),
+                CSVWriter.DEFAULT_SEPARATOR,        // デフォルトのカンマ区切り
+                CSVWriter.DEFAULT_QUOTE_CHARACTER,  // デフォルトの引用符
+                CSVWriter.DEFAULT_ESCAPE_CHARACTER, // デフォルトのエスケープ文字
+                CSVWriter.DEFAULT_LINE_END          // デフォルトの改行コード
             )) {
             writer.writeAll(books);
         } catch (IOException e) {

@@ -5,8 +5,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -115,7 +116,7 @@ public class BookRecords extends JFrame {
 
         // New Book Recordボタンを左寄せ
         JButton newBookButton = new JButton("新規作成");
-        newBookButton.setForeground(new Color(80, 230, 80));
+        newBookButton.setForeground(Color.black);
         newBookButton.addActionListener(e -> openNewBookRecord());
         newBookButton.setBackground(Color.white);
 
@@ -244,7 +245,7 @@ public class BookRecords extends JFrame {
 
     private void loadBooksFromCSV() {
         bookItems.clear();
-        try (CSVReader reader = new CSVReader(new FileReader("book_records.csv"))) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream("book_records.csv"), "Shift_JIS"))) {
             String[] nextLine;
             while ((nextLine = reader.readNext()) != null) {
                 if (nextLine.length == 6) {
@@ -347,7 +348,7 @@ public class BookRecords extends JFrame {
                     int reviewCount = Integer.parseInt((String) value);
                     StringBuilder stars = new StringBuilder("<html>");
                     for (int i = 0; i < 5; i++) {
-                        stars.append(i < reviewCount ? "<font color='yellow'>★</font>" : "<font color='gray'>★</font>");
+                        stars.append(i < reviewCount ? "<font color='#FFC800'>★</font>" : "<font color='gray'>★</font>");
                     }
                     stars.append("</html>");
                     setText(stars.toString());

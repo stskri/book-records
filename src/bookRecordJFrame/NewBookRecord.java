@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -141,7 +140,7 @@ public class NewBookRecord extends JFrame {
     }
 
     private void setupBackButton(JButton backButton) {
-        backButton.setForeground(new Color(100, 220, 220));
+        backButton.setForeground(new Color(200, 200, 200));
         backButton.setPreferredSize(new Dimension(150, 40));
         backButton.setBackground(new Color(252, 252, 252));
         backButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
@@ -370,7 +369,7 @@ public class NewBookRecord extends JFrame {
         for (int i = 0; i < stars.length; i++) {
             if (i < count) {
                 stars[i].setText("★");
-                stars[i].setForeground(Color.YELLOW);
+                stars[i].setForeground(new Color(255, 200, 0));
             } else {
                 stars[i].setText("☆");
                 stars[i].setForeground(Color.GRAY);
@@ -382,7 +381,7 @@ public class NewBookRecord extends JFrame {
         for (int i = 0; i < stars.length; i++) {
             if (i < count) {
                 stars[i].setText("★");
-                stars[i].setForeground(Color.YELLOW);
+                stars[i].setForeground(new Color(255, 200, 0));
             } else {
                 stars[i].setText("☆");
                 stars[i].setForeground(Color.GRAY);
@@ -411,8 +410,8 @@ public class NewBookRecord extends JFrame {
                 reviewText
             };
 
-            // CSVにレコードを追加
-            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream("book_records.csv", true), StandardCharsets.UTF_8))) {
+            // CSVにレコードを追加（シフトJISを使用）
+            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream("book_records.csv", true), "MS932"))) {
                 writer.writeNext(record);
             }
         } catch (IOException e) {

@@ -2,8 +2,9 @@ package bookRecordJFrame;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +61,7 @@ public class ShowBookRecord extends JFrame {
     private void setupComponents() {
         // 戻るボタン（一覧画面に戻る）
         JButton backToListButton = new JButton("一覧画面に戻る");
-        backToListButton.setForeground(new Color(100, 220, 220));
+        backToListButton.setForeground(new Color(200, 200, 200));
         backToListButton.setBackground(new Color(252, 252, 252));
         backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
         backToListButton.addActionListener(e -> {
@@ -159,7 +160,7 @@ public class ShowBookRecord extends JFrame {
             stars[i] = new JLabel("★");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
             stars[i].setBounds(185 + (i * 40), 185, 40, 40);
-            stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
+            stars[i].setForeground(i < selectedReview ? new Color(255, 200, 0) : Color.GRAY);
             contentPane.add(stars[i]);
         }
     }
@@ -179,7 +180,7 @@ public class ShowBookRecord extends JFrame {
 
     // CSVからデータを読み込むメソッド
     private String[] loadBookDataById(String bookId) {
-        try (CSVReader csvReader = new CSVReader(new FileReader("book_records.csv"))) {
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream("book_records.csv"), "Shift_JIS"))) {
             List<String[]> allRecords = csvReader.readAll();
             for (String[] record : allRecords) {
                 if (record[0].equals(bookId)) {

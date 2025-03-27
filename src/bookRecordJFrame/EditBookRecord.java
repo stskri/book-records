@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -89,7 +88,7 @@ public class EditBookRecord extends JFrame {
     private void setupComponents(String[] bookData) {
         // 戻るボタン（詳細画面に戻る）
         JButton backToListButton = new JButton("詳細画面に戻る");
-        backToListButton.setForeground(new Color(100, 220, 220));
+        backToListButton.setForeground(new Color(200, 200, 200));
         backToListButton.setBackground(new Color(252, 252, 252));
         backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
         backToListButton.addActionListener(e -> {
@@ -193,7 +192,7 @@ public class EditBookRecord extends JFrame {
 
     // CSVからデータを読み込むメソッド
     private String[] loadBookDataById(String bookId) {
-    	try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream("book_records.csv"), StandardCharsets.UTF_8))) {
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream("book_records.csv"), "Shift_JIS"))) {
             String[] nextRecord;
             while ((nextRecord = csvReader.readNext()) != null) {
                 // bookIdが一致するデータを探す
@@ -229,7 +228,7 @@ public class EditBookRecord extends JFrame {
             stars[i] = new JLabel(i < selectedReview ? "★" : "☆");
             stars[i].setFont(new Font("SansSerif", Font.PLAIN, 30));
             stars[i].setBounds(185 + (i * 40), 185, 40, 40); // Y座標を190に変更
-            stars[i].setForeground(i < selectedReview ? Color.YELLOW : Color.GRAY);
+            stars[i].setForeground(i < selectedReview ? new Color(255, 200, 0) : Color.GRAY);
             contentPane.add(stars[i]);
 
             final int index = i + 1;
@@ -411,7 +410,7 @@ public class EditBookRecord extends JFrame {
         for (int i = 0; i < 5; i++) {
             if (i < review) {
                 stars[i].setText("★");
-                stars[i].setForeground(Color.YELLOW);
+                stars[i].setForeground(new Color(255, 200, 0));
             } else {
                 stars[i].setText("☆");
                 stars[i].setForeground(Color.GRAY);
