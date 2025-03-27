@@ -69,7 +69,7 @@ public class EditBookRecord extends JFrame {
     // フレームの初期設定
     private void initializeFrame() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 900, 600);
+        setBounds(100, 100, 900, 550);
         contentPane = new JPanel();
         contentPane.setBackground(new Color(255, 255, 255));
         setContentPane(contentPane);
@@ -81,7 +81,7 @@ public class EditBookRecord extends JFrame {
         // 戻るボタン（詳細画面に戻る）
         JButton backToListButton = new JButton("詳細画面に戻る");
         backToListButton.setForeground(new Color(220, 220, 220));
-        backToListButton.setBackground(new Color(245, 245, 245));
+        backToListButton.setBackground(new Color(252, 252, 252));
         backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
         backToListButton.addActionListener(e -> {
             dispose();
@@ -92,13 +92,13 @@ public class EditBookRecord extends JFrame {
 
         // IDと登録日表示（右寄せ）
         JLabel idLabel = new JLabel("ID: " + bookData[0]);
-        idLabel.setBounds(650, 10, 200, 30);
-        idLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        idLabel.setBounds(190, 30, 120, 30);
+        idLabel.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(idLabel);
 
         JLabel dateLabel = new JLabel("登録日: " + bookData[1]);
-        dateLabel.setBounds(650, 35, 200, 30);
-        dateLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        dateLabel.setBounds(320, 30, 200, 30);
+        dateLabel.setHorizontalAlignment(SwingConstants.LEFT);
         contentPane.add(dateLabel);
 
         // タイトル入力フィールド
@@ -160,33 +160,24 @@ public class EditBookRecord extends JFrame {
 
         // 保存ボタン
         saveButton = new JButton("変更を保存");
-        saveButton.setBounds(120, 450, 200, 40);  // Y座標を450に変更
+        saveButton.setBounds(350, 445, 200, 40);
         saveButton.setBackground(new Color(50, 205, 50));  // Green color like NewBookRecord
         saveButton.setForeground(Color.WHITE);
         contentPane.add(saveButton);
 
-        // 戻るボタン（詳細画面に戻る）
-        JButton backToDetailButton = new JButton("戻る");
-        backToDetailButton.setBounds(350, 450, 200, 40);  // Y座標を450に変更
-        backToDetailButton.setBackground(new Color(50, 205, 50));
-        backToDetailButton.setForeground(Color.WHITE);
-        backToDetailButton.addActionListener(e -> {
-            dispose();
-            new ShowBookRecord(bookData[0]).setVisible(true);
-        });
-        contentPane.add(backToDetailButton);
-
         // 削除ボタン
         JButton deleteButton = new JButton("書籍を削除");
-        deleteButton.setBounds(580, 450, 200, 40);  // Y座標を450に変更
-        deleteButton.setBackground(new Color(50, 205, 50));  // Same color as save button
-        deleteButton.setForeground(Color.WHITE);
+        deleteButton.setBounds(710, 25, 150, 40);
+        deleteButton.setForeground(Color.red);
+        deleteButton.setBorder(BorderFactory.createLineBorder(Color.red, 1));
         deleteButton.addActionListener(e -> confirmAndDeleteBook(bookData[0]));
         contentPane.add(deleteButton);
 
         // バリデーションとイベントリスナーのセットアップ
         setupValidation();
         setupSaveButton(bookData);
+        
+        
     }
 
     // CSVからデータを読み込むメソッド
@@ -432,6 +423,18 @@ public class EditBookRecord extends JFrame {
         boolean isThoughtsValid = isThoughtsValid();
 
         saveButton.setEnabled(isTitleValid && isAuthorValid && isThoughtsValid);
+        
+        // 入力が有効な場合、ボタンのスタイルを変更
+        if (isTitleValid && isAuthorValid && isThoughtsValid) {
+            saveButton.setForeground(new Color(0, 180, 0)); // 濃い緑色のテキスト
+            saveButton.setBackground(new Color(255, 255, 255));
+            saveButton.setBorder(BorderFactory.createLineBorder(new Color(0, 180, 0), 2)); // 濃い緑色のボーダー
+        } else {
+            // デフォルトのスタイルに戻す
+            saveButton.setForeground(Color.WHITE);
+            saveButton.setBackground(null);
+            saveButton.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2)); // グレーのボーダー
+        }
     }
 
     // タイトルの有効性チェック
