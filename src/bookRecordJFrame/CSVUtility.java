@@ -3,6 +3,7 @@ package bookRecordJFrame;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,13 @@ public class CSVUtility {
 
     // 書籍データをCSVファイルに書き込む
     public static void writeBooksToCSV(List<String[]> books) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(FILE_PATH))) {
+        try (CSVWriter writer = new CSVWriter(
+                new FileWriter(FILE_PATH, StandardCharsets.UTF_8),  // Specify UTF-8 encoding
+                CSVWriter.DEFAULT_SEPARATOR,        // Use default comma separator
+                CSVWriter.DEFAULT_QUOTE_CHARACTER,  // Use default quote character
+                CSVWriter.DEFAULT_ESCAPE_CHARACTER, // Use default escape character
+                CSVWriter.DEFAULT_LINE_END         // Use default line ending
+            )) {
             writer.writeAll(books);
         } catch (IOException e) {
             e.printStackTrace();

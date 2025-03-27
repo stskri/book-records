@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -410,7 +412,7 @@ public class NewBookRecord extends JFrame {
             };
 
             // CSVにレコードを追加
-            try (CSVWriter writer = new CSVWriter(new FileWriter("book_records.csv", true))) {
+            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(new FileOutputStream("book_records.csv", true), StandardCharsets.UTF_8))) {
                 writer.writeNext(record);
             }
         } catch (IOException e) {

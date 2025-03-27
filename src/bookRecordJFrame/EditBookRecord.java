@@ -2,8 +2,10 @@ package bookRecordJFrame;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -191,7 +193,7 @@ public class EditBookRecord extends JFrame {
 
     // CSVからデータを読み込むメソッド
     private String[] loadBookDataById(String bookId) {
-        try (CSVReader csvReader = new CSVReader(new FileReader("book_records.csv"))) {
+    	try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream("book_records.csv"), StandardCharsets.UTF_8))) {
             String[] nextRecord;
             while ((nextRecord = csvReader.readNext()) != null) {
                 // bookIdが一致するデータを探す
