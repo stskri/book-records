@@ -143,19 +143,19 @@ public class NewBookRecord extends JFrame {
         setupSaveButton();
         
         // タイトル文字数カウントラベルの追加
-        titleCharCountLabel = new JLabel("0/30", SwingConstants.RIGHT);
+        titleCharCountLabel = new JLabel("0/30", SwingConstants.CENTER);
         titleCharCountLabel.setBounds(735, 115, 50, 20);
         titleCharCountLabel.setForeground(Color.GRAY);
         contentPane.add(titleCharCountLabel);
 
         // 作者文字数カウントラベルの追加
-        authorCharCountLabel = new JLabel("0/15", SwingConstants.RIGHT);
+        authorCharCountLabel = new JLabel("0/15", SwingConstants.CENTER);
         authorCharCountLabel.setBounds(735, 165, 50, 20);
         authorCharCountLabel.setForeground(Color.GRAY);
         contentPane.add(authorCharCountLabel);
 
         // 感想文字数カウントラベルの追加
-        reviewCharCountLabel = new JLabel("0/400", SwingConstants.RIGHT);
+        reviewCharCountLabel = new JLabel("0/400", SwingConstants.CENTER);
         reviewCharCountLabel.setBounds(735, 415, 50, 20);
         reviewCharCountLabel.setForeground(Color.GRAY);
         contentPane.add(reviewCharCountLabel);

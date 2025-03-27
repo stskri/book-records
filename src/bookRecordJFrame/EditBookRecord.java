@@ -132,7 +132,7 @@ public class EditBookRecord extends JFrame {
         setupTextField(titleField);
 
         titleErrorLabel = new JLabel();
-        titleErrorLabel.setBounds(185, 120, 600, 20);  // Y座標を調整
+        titleErrorLabel.setBounds(185, 120, 500, 20);  // Y座標を調整
         titleErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(titleErrorLabel);
 
@@ -146,7 +146,7 @@ public class EditBookRecord extends JFrame {
         setupTextField(authorField);
 
         authorErrorLabel = new JLabel();
-        authorErrorLabel.setBounds(185, 170, 600, 20);  // Y座標を調整
+        authorErrorLabel.setBounds(185, 170, 500, 20);  // Y座標を調整
         authorErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(authorErrorLabel);
 
@@ -175,24 +175,24 @@ public class EditBookRecord extends JFrame {
         contentPane.add(thoughtsScrollPane);
 
         thoughtsErrorLabel = new JLabel();
-        thoughtsErrorLabel.setBounds(185, 420, 600, 20);  // Y座標を調整
+        thoughtsErrorLabel.setBounds(185, 420, 500, 20);  // Y座標を調整
         thoughtsErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(thoughtsErrorLabel);
         
         // タイトル文字数カウントラベルの追加
-        titleCharCountLabel = new JLabel("0/30", SwingConstants.RIGHT);
+        titleCharCountLabel = new JLabel("0/30", SwingConstants.CENTER);
         titleCharCountLabel.setBounds(735, 120, 50, 20);
         titleCharCountLabel.setForeground(Color.GRAY);
         contentPane.add(titleCharCountLabel);
 
         // 作者文字数カウントラベルの追加
-        authorCharCountLabel = new JLabel("0/15", SwingConstants.RIGHT);
+        authorCharCountLabel = new JLabel("0/15", SwingConstants.CENTER);
         authorCharCountLabel.setBounds(735, 170, 50, 20);
         authorCharCountLabel.setForeground(Color.GRAY);
         contentPane.add(authorCharCountLabel);
 
         // 感想文字数カウントラベルの追加
-        thoughtsCharCountLabel = new JLabel("0/400", SwingConstants.RIGHT);
+        thoughtsCharCountLabel = new JLabel("0/400", SwingConstants.CENTER);
         thoughtsCharCountLabel.setBounds(735, 420, 50, 20);
         thoughtsCharCountLabel.setForeground(Color.GRAY);
         contentPane.add(thoughtsCharCountLabel);
