@@ -72,7 +72,7 @@ public class NewBookRecord extends JFrame {
         contentPane.setLayout(null);
 
         // 戻るボタン
-        JButton backButton = new JButton("Back to List");
+        JButton backButton = new JButton("一覧画面に戻る");
         setupBackButton(backButton);
 
         // タイトル入力フィールド
@@ -86,7 +86,6 @@ public class NewBookRecord extends JFrame {
 
         titleErrorLabel = new JLabel();
         titleErrorLabel.setBounds(185, 115, 600, 20);
-        titleErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(titleErrorLabel);
 
         // 作者入力フィールド
@@ -100,7 +99,6 @@ public class NewBookRecord extends JFrame {
 
         authorErrorLabel = new JLabel();
         authorErrorLabel.setBounds(185, 165, 600, 20);
-        authorErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(authorErrorLabel);
 
         // 星評価のラベル
@@ -127,11 +125,10 @@ public class NewBookRecord extends JFrame {
 
         reviewErrorLabel = new JLabel();
         reviewErrorLabel.setBounds(185, 415, 600, 20);
-        reviewErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(reviewErrorLabel);
 
         // 保存ボタン
-        saveButton = new JButton("Save Record");
+        saveButton = new JButton("保存");
         saveButton.setBounds(350, 445, 200, 40);
         contentPane.add(saveButton);
 
@@ -142,7 +139,6 @@ public class NewBookRecord extends JFrame {
 
     private void setupBackButton(JButton backButton) {
         backButton.setForeground(new Color(220, 220, 220));
-        backButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         backButton.setPreferredSize(new Dimension(150, 40));
         backButton.setBackground(new Color(245, 245, 245));
         backButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
@@ -322,6 +318,17 @@ public class NewBookRecord extends JFrame {
         boolean isReviewValid = isReviewValid();
 
         saveButton.setEnabled(isTitleValid && isAuthorValid && isReviewValid);
+        
+        // 入力が有効な場合、ボタンのスタイルを変更
+        if (isTitleValid && isAuthorValid && isReviewValid) {
+        	saveButton.setForeground(new Color(0, 180, 0));
+            saveButton.setBorder(BorderFactory.createLineBorder(new Color(0, 180, 0), 2)); // 濃い緑色のボーダー
+        } else {
+            // デフォルトのスタイルに戻す
+        	saveButton.setForeground(Color.BLACK);
+            saveButton.setBackground(null); // デフォルトの背景色
+            saveButton.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2)); // グレーのボーダー
+        }
     }
 
     private boolean isTitleValid() {
@@ -341,6 +348,8 @@ public class NewBookRecord extends JFrame {
 
     private void setupSaveButton() {
         saveButton.setEnabled(false);
+        saveButton.setBackground(new Color(245, 245, 245)); // 初期状態のグレー背景
+        saveButton.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 2)); // グレーのボーダー
         saveButton.addActionListener(e -> {
             String title = titleField.getText().trim();
             String author = authorField.getText().trim();

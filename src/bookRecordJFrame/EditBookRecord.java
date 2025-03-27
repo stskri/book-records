@@ -74,22 +74,18 @@ public class EditBookRecord extends JFrame {
         contentPane.setBackground(new Color(255, 255, 255));
         setContentPane(contentPane);
         contentPane.setLayout(null);
-        
-        // Back to Listボタンを追加
-        setupBackToListButton();
     }
 
     // コンポーネントのセットアップ
     private void setupComponents(String[] bookData) {
-        // 戻るボタン
-        JButton backToListButton = new JButton("Back to List");
+        // 戻るボタン（詳細画面に戻る）
+        JButton backToListButton = new JButton("詳細画面に戻る");
         backToListButton.setForeground(new Color(220, 220, 220));
-        backToListButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         backToListButton.setBackground(new Color(245, 245, 245));
         backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
         backToListButton.addActionListener(e -> {
             dispose();
-            new BookRecords().setVisible(true);
+            new ShowBookRecord(bookData[0]).setVisible(true);
         });
         backToListButton.setBounds(30, 25, 150, 40);
         contentPane.add(backToListButton);
@@ -224,20 +220,7 @@ public class EditBookRecord extends JFrame {
         contentPane.add(textField);
     }
 
-    
-    private void setupBackToListButton() {
-        JButton backToListButton = new JButton("Back to List");
-        backToListButton.setForeground(new Color(220, 220, 220));
-        backToListButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-        backToListButton.setBackground(new Color(245, 245, 245));
-        backToListButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 0));
-        backToListButton.addActionListener(e -> {
-            dispose();
-            new BookRecords().setVisible(true);
-        });
-        contentPane.add(backToListButton);
-        backToListButton.setBounds(30, 25, 150, 40);
-    }
+
     
     private void setupStarRating(String[] bookData) {
         selectedReview = Integer.parseInt(bookData[4]); // 現在の評価を取得

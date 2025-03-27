@@ -114,7 +114,7 @@ public class BookRecords extends JFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 30, 10, 20));
 
         // New Book Recordボタンを左寄せ
-        JButton newBookButton = new JButton("New Book Record");
+        JButton newBookButton = new JButton("新規作成");
         newBookButton.addActionListener(e -> openNewBookRecord());
         newBookButton.setBackground(Color.white);
 
