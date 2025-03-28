@@ -1,7 +1,10 @@
 package bookRecordJFrame;
 
+
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -209,6 +212,8 @@ public class EditBookRecord extends JFrame {
         setupSaveButton(bookData);
         
         setupCharacterCountDisplay();
+        
+        preventBackslashInput();
         
         SwingUtilities.invokeLater(() -> {
             updateTitleCharCount();
@@ -561,6 +566,39 @@ public class EditBookRecord extends JFrame {
             authorCharCountLabel.setForeground(Color.GRAY);
         }
     }
+    
+
+private void preventBackslashInput() {
+    // タイトルフィールドのキー入力制限
+    titleField.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            if (e.getKeyChar() == '\\') {
+                e.consume(); // バックスラッシュの入力をブロック
+            }
+        }
+    });
+
+    // 作者フィールドのキー入力制限
+    authorField.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            if (e.getKeyChar() == '\\') {
+                e.consume(); // バックスラッシュの入力をブロック
+            }
+        }
+    });
+
+    // 感想テキストエリアのキー入力制限
+    thoughtsArea.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            if (e.getKeyChar() == '\\') {
+                e.consume(); // バックスラッシュの入力をブロック
+            }
+        }
+    });
+}
 
     // 感想の文字数カウント更新メソッド
     private void updateThoughtsCharCount() {

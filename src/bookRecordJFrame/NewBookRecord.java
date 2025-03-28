@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -142,6 +144,9 @@ public class NewBookRecord extends JFrame {
         setupValidation();
         setupSaveButton();
         
+        // バックスラッシュ入力防止
+        preventBackslashInput();
+        
         // タイトル文字数カウントラベルの追加
         titleCharCountLabel = new JLabel("0/30", SwingConstants.CENTER);
         titleCharCountLabel.setBounds(735, 115, 50, 20);
@@ -162,6 +167,39 @@ public class NewBookRecord extends JFrame {
 
         // 文字数カウントのセットアップ
         setupCharacterCountDisplay();
+    }
+
+    // バックスラッシュ入力防止メソッド
+    private void preventBackslashInput() {
+        // タイトルフィールドのキー入力制限
+        titleField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == '\\') {
+                    e.consume(); // バックスラッシュの入力をブロック
+                }
+            }
+        });
+
+        // 作者フィールドのキー入力制限
+        authorField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == '\\') {
+                    e.consume(); // バックスラッシュの入力をブロック
+                }
+            }
+        });
+
+        // レビューテキストエリアのキー入力制限
+        reviewTextArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == '\\') {
+                    e.consume(); // バックスラッシュの入力をブロック
+                }
+            }
+        });
     }
 
     private void setupBackButton(JButton backButton) {
@@ -238,6 +276,12 @@ public class NewBookRecord extends JFrame {
 
             private void validateTitle() {
                 String title = titleField.getText().trim();
+                if (title.contains("\\")) {
+                    // Remove backslashes
+                    title = title.replace("\\", "");
+                    titleField.setText(title);
+                }
+                
                 if (title.isEmpty()) {
                     showTitleError("タイトルを入力してください");
                 } else if (title.length() < 1 || title.length() > 30) {
@@ -269,6 +313,12 @@ public class NewBookRecord extends JFrame {
 
             private void validateAuthor() {
                 String author = authorField.getText().trim();
+                if (author.contains("\\")) {
+                    // Remove backslashes
+                    author = author.replace("\\", "");
+                    authorField.setText(author);
+                }
+                
                 if (author.isEmpty()) {
                     showAuthorError("著者を入力してください");
                 } else if (author.length() < 1 || author.length() > 15) {
@@ -300,6 +350,12 @@ public class NewBookRecord extends JFrame {
 
             private void validateReview() {
                 String reviewText = reviewTextArea.getText().trim();
+                if (reviewText.contains("\\")) {
+                    // Remove backslashes
+                    reviewText = reviewText.replace("\\", "");
+                    reviewTextArea.setText(reviewText);
+                }
+                
                 if (reviewText.isEmpty()) {
                     showReviewError("感想を入力してください");
                 } else if (reviewText.length() < 1 || reviewText.length() > 400) {
