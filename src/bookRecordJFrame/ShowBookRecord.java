@@ -77,8 +77,8 @@ public class ShowBookRecord extends JFrame {
         idLabel.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(idLabel);
 
-        JLabel dateLabel = new JLabel("登録日: " + formatDate(bookData[1]));
-        dateLabel.setBounds(320, 30, 200, 30);
+        JLabel dateLabel = new JLabel("Registration Date: " + formatDate(bookData[1]));
+        dateLabel.setBounds(320, 30, 230, 30);
         dateLabel.setHorizontalAlignment(SwingConstants.LEFT);
         contentPane.add(dateLabel);
         
@@ -171,7 +171,7 @@ public class ShowBookRecord extends JFrame {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = inputFormat.parse(dateStr);
 
-            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy年M月d日");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return outputFormat.format(date);
         } catch (Exception e) {
             return dateStr;
