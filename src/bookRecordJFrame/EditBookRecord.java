@@ -136,7 +136,6 @@ public class EditBookRecord extends JFrame {
 
         titleErrorLabel = new JLabel();
         titleErrorLabel.setBounds(185, 120, 500, 20);  // Y座標を調整
-        titleErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(titleErrorLabel);
 
         // 著者入力フィールド
@@ -150,7 +149,6 @@ public class EditBookRecord extends JFrame {
 
         authorErrorLabel = new JLabel();
         authorErrorLabel.setBounds(185, 170, 500, 20);  // Y座標を調整
-        authorErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(authorErrorLabel);
 
         // 星評価のラベル
@@ -179,7 +177,6 @@ public class EditBookRecord extends JFrame {
 
         thoughtsErrorLabel = new JLabel();
         thoughtsErrorLabel.setBounds(185, 420, 500, 20);  // Y座標を調整
-        thoughtsErrorLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         contentPane.add(thoughtsErrorLabel);
         
         // タイトル文字数カウントラベルの追加
@@ -313,10 +310,16 @@ public class EditBookRecord extends JFrame {
         setupAuthorValidation();
         setupThoughtsValidation();
     }
+    
+ // 空白文字のみかどうかをチェックするヘルパーメソッド
+    private boolean isOnlyWhitespace(String text) {
+        String processed = text.replaceAll("　", " ").trim();
+        return processed.isEmpty();
+    }
 
     // タイトルバリデーション
     private void setupTitleValidation() {
-        titleField.getDocument().addDocumentListener(new DocumentListener() {
+    	titleField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 validateTitle();
@@ -333,14 +336,23 @@ public class EditBookRecord extends JFrame {
             }
 
             private void validateTitle() {
-                String title = titleField.getText().trim();
-                if (title.isEmpty()) {
+                String title = titleField.getText();
+                if (title.contains("\\")) {
+                    // Remove backslashes
+                    title = title.replace("\\", "");
+                    titleField.setText(title);
+                }
+                
+                // 空白文字のみのチェックを追加
+                if (isOnlyWhitespace(title)) {
                     showTitleError("タイトルを入力してください");
-                } else if (title.length() < 1 || title.length() > 30) {
+                } else if (title.replaceAll("　", " ").trim().length() < 1 || 
+                          title.length() > 30) {
                     showTitleError("タイトルは1〜30文字にしてください");
                 } else {
                     clearTitleError();
                 }
+                updateTitleCharCount();
                 updateSaveButtonState();
             }
         });
@@ -348,7 +360,7 @@ public class EditBookRecord extends JFrame {
 
     // 著者バリデーション
     private void setupAuthorValidation() {
-        authorField.getDocument().addDocumentListener(new DocumentListener() {
+    	authorField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 validateAuthor();
@@ -365,14 +377,23 @@ public class EditBookRecord extends JFrame {
             }
 
             private void validateAuthor() {
-                String author = authorField.getText().trim();
-                if (author.isEmpty()) {
+                String author = authorField.getText();
+                if (author.contains("\\")) {
+                    // Remove backslashes
+                    author = author.replace("\\", "");
+                    authorField.setText(author);
+                }
+                
+                // 空白文字のみのチェックを追加
+                if (isOnlyWhitespace(author)) {
                     showAuthorError("著者を入力してください");
-                } else if (author.length() < 1 || author.length() > 15) {
+                } else if (author.replaceAll("　", " ").trim().length() < 1 || 
+                          author.length() > 15) {
                     showAuthorError("著者は1〜15文字にしてください");
                 } else {
                     clearAuthorError();
                 }
+                updateAuthorCharCount();
                 updateSaveButtonState();
             }
         });
@@ -380,7 +401,7 @@ public class EditBookRecord extends JFrame {
 
     // 感想バリデーション
     private void setupThoughtsValidation() {
-        thoughtsArea.getDocument().addDocumentListener(new DocumentListener() {
+    	thoughtsArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 validateThoughts();
@@ -397,14 +418,23 @@ public class EditBookRecord extends JFrame {
             }
 
             private void validateThoughts() {
-                String thoughts = thoughtsArea.getText().trim();
-                if (thoughts.isEmpty()) {
+                String reviewText = thoughtsArea.getText();
+                if (reviewText.contains("\\")) {
+                    // Remove backslashes
+                    reviewText = reviewText.replace("\\", "");
+                    thoughtsArea.setText(reviewText);
+                }
+                
+                // 空白文字のみのチェックを追加
+                if (isOnlyWhitespace(reviewText)) {
                     showThoughtsError("感想を入力してください");
-                } else if (thoughts.length() < 1 || thoughts.length() > 400) {
+                } else if (reviewText.replaceAll("　", " ").trim().length() < 1 || 
+                          reviewText.length() > 400) {
                     showThoughtsError("感想は1〜400文字にしてください");
                 } else {
                     clearThoughtsError();
                 }
+                updateThoughtsCharCount();
                 updateSaveButtonState();
             }
         });
@@ -476,7 +506,7 @@ public class EditBookRecord extends JFrame {
     private void showThoughtsError(String message) {
         thoughtsErrorLabel.setText(message);
         thoughtsErrorLabel.setForeground(Color.RED);
-        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(Color.RED, 2));
+        thoughtsScrollPane.setViewportBorder(BorderFactory.createLineBorder(Color.RED, 0));
     }
 
     // 感想エラーのクリア
@@ -634,24 +664,26 @@ private void preventBackslashInput() {
         }
     }
 
-    // タイトルの有効性チェック
     private boolean isTitleValid() {
-        String title = titleField.getText().trim();
-        return title.length() >= 1 && title.length() <= 30;
+        String title = titleField.getText();
+        return !isOnlyWhitespace(title) && 
+               title.replaceAll("　", " ").trim().length() >= 1 && 
+               title.length() <= 30;
     }
 
-    // 著者の有効性チェック
     private boolean isAuthorValid() {
-        String author = authorField.getText().trim();
-        return author.length() >= 1 && author.length() <= 15;
+        String author = authorField.getText();
+        return !isOnlyWhitespace(author) && 
+               author.replaceAll("　", " ").trim().length() >= 1 && 
+               author.length() <= 15;
     }
 
-    // 感想の有効性チェック
     private boolean isThoughtsValid() {
-        String thoughts = thoughtsArea.getText().trim();
-        return thoughts.length() >= 1 && thoughts.length() <= 400;
+        String reviewText = thoughtsArea.getText();
+        return !isOnlyWhitespace(reviewText) && 
+               reviewText.replaceAll("　", " ").trim().length() >= 1 && 
+               reviewText.length() <= 400;
     }
-
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());

@@ -256,6 +256,11 @@ public class NewBookRecord extends JFrame {
         setupAuthorValidation();
         setupReviewValidation();
     }
+    
+    private boolean isOnlyWhitespace(String text) {
+        String processed = text.replaceAll("　", " ").trim();
+        return processed.isEmpty();
+    }
 
     private void setupTitleValidation() {
         titleField.getDocument().addDocumentListener(new DocumentListener() {
@@ -275,16 +280,18 @@ public class NewBookRecord extends JFrame {
             }
 
             private void validateTitle() {
-                String title = titleField.getText().trim();
+                String title = titleField.getText();
                 if (title.contains("\\")) {
                     // Remove backslashes
                     title = title.replace("\\", "");
                     titleField.setText(title);
                 }
                 
-                if (title.isEmpty()) {
+                // 空白文字のみのチェックを追加
+                if (isOnlyWhitespace(title)) {
                     showTitleError("タイトルを入力してください");
-                } else if (title.length() < 1 || title.length() > 30) {
+                } else if (title.replaceAll("　", " ").trim().length() < 1 || 
+                          title.length() > 30) {
                     showTitleError("タイトルは1〜30文字にしてください");
                 } else {
                     clearTitleError();
@@ -293,9 +300,9 @@ public class NewBookRecord extends JFrame {
             }
         });
     }
-
+    
     private void setupAuthorValidation() {
-        authorField.getDocument().addDocumentListener(new DocumentListener() {
+    	authorField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 validateAuthor();
@@ -312,16 +319,18 @@ public class NewBookRecord extends JFrame {
             }
 
             private void validateAuthor() {
-                String author = authorField.getText().trim();
+                String author = authorField.getText();
                 if (author.contains("\\")) {
                     // Remove backslashes
                     author = author.replace("\\", "");
                     authorField.setText(author);
                 }
                 
-                if (author.isEmpty()) {
+                // 空白文字のみのチェックを追加
+                if (isOnlyWhitespace(author)) {
                     showAuthorError("著者を入力してください");
-                } else if (author.length() < 1 || author.length() > 15) {
+                } else if (author.replaceAll("　", " ").trim().length() < 1 || 
+                          author.length() > 15) {
                     showAuthorError("著者は1〜15文字にしてください");
                 } else {
                     clearAuthorError();
@@ -332,40 +341,42 @@ public class NewBookRecord extends JFrame {
     }
 
     private void setupReviewValidation() {
-        reviewTextArea.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                validateReview();
-            }
+    	 reviewTextArea.getDocument().addDocumentListener(new DocumentListener() {
+    	        @Override
+    	        public void insertUpdate(DocumentEvent e) {
+    	            validateReview();
+    	        }
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                validateReview();
-            }
+    	        @Override
+    	        public void removeUpdate(DocumentEvent e) {
+    	            validateReview();
+    	        }
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                validateReview();
-            }
+    	        @Override
+    	        public void changedUpdate(DocumentEvent e) {
+    	            validateReview();
+    	        }
 
-            private void validateReview() {
-                String reviewText = reviewTextArea.getText().trim();
-                if (reviewText.contains("\\")) {
-                    // Remove backslashes
-                    reviewText = reviewText.replace("\\", "");
-                    reviewTextArea.setText(reviewText);
-                }
-                
-                if (reviewText.isEmpty()) {
-                    showReviewError("感想を入力してください");
-                } else if (reviewText.length() < 1 || reviewText.length() > 400) {
-                    showReviewError("感想は1〜400文字にしてください");
-                } else {
-                    clearReviewError();
-                }
-                updateSaveButtonState();
-            }
-        });
+    	        private void validateReview() {
+    	            String reviewText = reviewTextArea.getText();
+    	            if (reviewText.contains("\\")) {
+    	                // Remove backslashes
+    	                reviewText = reviewText.replace("\\", "");
+    	                reviewTextArea.setText(reviewText);
+    	            }
+    	            
+    	            // 空白文字のみのチェックを追加
+    	            if (isOnlyWhitespace(reviewText)) {
+    	                showReviewError("感想を入力してください");
+    	            } else if (reviewText.replaceAll("　", " ").trim().length() < 1 || 
+    	                      reviewText.length() > 400) {
+    	                showReviewError("感想は1〜400文字にしてください");
+    	            } else {
+    	                clearReviewError();
+    	            }
+    	            updateSaveButtonState();
+    	        }
+    	    });
     }
     
     // 文字数カウント表示のセットアップ
@@ -511,18 +522,24 @@ public class NewBookRecord extends JFrame {
     }
 
     private boolean isTitleValid() {
-        String title = titleField.getText().trim();
-        return title.length() >= 1 && title.length() <= 30;
+        String title = titleField.getText();
+        return !isOnlyWhitespace(title) && 
+               title.replaceAll("　", " ").trim().length() >= 1 && 
+               title.length() <= 30;
     }
 
     private boolean isAuthorValid() {
-        String author = authorField.getText().trim();
-        return author.length() >= 1 && author.length() <= 15;
+        String author = authorField.getText();
+        return !isOnlyWhitespace(author) && 
+               author.replaceAll("　", " ").trim().length() >= 1 && 
+               author.length() <= 15;
     }
 
     private boolean isReviewValid() {
-        String reviewText = reviewTextArea.getText().trim();
-        return reviewText.length() >= 1 && reviewText.length() <= 400;
+        String reviewText = reviewTextArea.getText();
+        return !isOnlyWhitespace(reviewText) && 
+               reviewText.replaceAll("　", " ").trim().length() >= 1 && 
+               reviewText.length() <= 400;
     }
 
     private void setupSaveButton() {
